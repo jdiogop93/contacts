@@ -87,5 +87,59 @@ public class ApplicationDbContextInitialiser
 
             await _context.SaveChangesAsync();
         }
+
+        #region Contacts
+        if (!_context.Contacts.Any())
+        {
+            _context.Contacts.AddRange(new List<Contact>
+            {
+                //1
+                new Contact
+                {
+                    FirstName = "José",
+                    LastName = "Pereira",
+                    Initials = "JP",
+                    Address = new Domain.ValueObjects.Address("Nogueira", "4900", "Viana do Castelo", "Portugal"),
+                    Email = "jdiogopereira93@gmail.com",
+                    Numbers = new List<ContactNumber>
+                    {
+                        new ContactNumber
+                        {
+                            CountryCode = "+351",
+                            PhoneNumber = "960000000",
+                            Type = Domain.Enums.ContactNumberType.Work
+                        },
+                        new ContactNumber
+                        {
+                            CountryCode = "+48",
+                            PhoneNumber = "0011223344",
+                            Type = Domain.Enums.ContactNumberType.Mobile
+                        }
+                    }
+                },
+                //2
+                new Contact
+                {
+                    FirstName = "Catarina",
+                    LastName = "Pereira",
+                    Initials = "CP",
+                    Address = new Domain.ValueObjects.Address("Massarelos", "4901", "Porto", "Portugal"),
+                    Email = "jde93pereira@gmail.com",
+                    Numbers = new List<ContactNumber>
+                    {
+                        new ContactNumber
+                        {
+                            CountryCode = "+351",
+                            PhoneNumber = "258000999",
+                            Type = Domain.Enums.ContactNumberType.Home
+                        }
+                    }
+                }
+            });
+
+            await _context.SaveChangesAsync();
+        }
+        #endregion
+
     }
 }
