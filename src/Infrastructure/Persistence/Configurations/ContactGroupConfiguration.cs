@@ -12,8 +12,7 @@ public class ContactGroupConfiguration : IEntityTypeConfiguration<ContactGroup>
         builder.ToTable("ContactGroups");
 
         builder.Property(t => t.Name)
-            .HasMaxLength(200)
-            .IsRequired();
+            .HasMaxLength(200);
 
         builder.HasMany(p => p.Contacts)
             .WithMany(p => p.Groups)

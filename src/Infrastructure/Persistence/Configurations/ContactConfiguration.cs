@@ -29,16 +29,13 @@ public class ContactConfiguration : IEntityTypeConfiguration<Contact>
         });
 
         builder.Property(t => t.FirstName)
-            .HasMaxLength(200)
-            .IsRequired();
+            .HasMaxLength(200);
 
         builder.Property(t => t.LastName)
-            .HasMaxLength(200)
-            .IsRequired();
+            .HasMaxLength(200);
 
         builder.Property(t => t.Initials)
-            .HasMaxLength(2)
-            .IsRequired();
+            .HasMaxLength(2);
 
         builder.OwnsOne(x => x.Address, cb =>
         {
@@ -60,7 +57,6 @@ public class ContactConfiguration : IEntityTypeConfiguration<Contact>
         });
 
         builder.Property(t => t.Email)
-            .HasMaxLength(200)
-            .IsRequired();
+            .HasMaxLength(200);
     }
 }

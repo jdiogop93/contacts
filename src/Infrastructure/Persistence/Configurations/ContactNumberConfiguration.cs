@@ -16,12 +16,10 @@ public class ContactNumberConfiguration : IEntityTypeConfiguration<ContactNumber
             .HasForeignKey(x => x.ContactId);
 
         builder.Property(t => t.CountryCode)
-            .HasMaxLength(5)
-            .IsRequired();
+            .HasMaxLength(5);
 
         builder.Property(t => t.PhoneNumber)
-            .HasMaxLength(20)
-            .IsRequired();
+            .HasMaxLength(20);
 
         builder.Property(x => x.Type)
             .HasMaxLength(10)

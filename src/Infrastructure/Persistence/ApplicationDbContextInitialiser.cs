@@ -107,13 +107,13 @@ public class ApplicationDbContextInitialiser
                         {
                             CountryCode = "+351",
                             PhoneNumber = "960000000",
-                            Type = Domain.Enums.ContactNumberType.Work
+                            Type = Domain.Enums.ContactNumberType.WORK
                         },
                         new ContactNumber
                         {
                             CountryCode = "+48",
                             PhoneNumber = "0011223344",
-                            Type = Domain.Enums.ContactNumberType.Mobile
+                            Type = Domain.Enums.ContactNumberType.MOBILE
                         }
                     }
                 },
@@ -131,7 +131,7 @@ public class ApplicationDbContextInitialiser
                         {
                             CountryCode = "+351",
                             PhoneNumber = "258000999",
-                            Type = Domain.Enums.ContactNumberType.Home
+                            Type = Domain.Enums.ContactNumberType.HOME
                         }
                     }
                 }

@@ -2,7 +2,7 @@
 
 public enum ContactNumberType
 {
-    Home = 0,
-    Mobile = 1,
-    Work = 2
+    HOME = 0,
+    MOBILE = 1,
+    WORK = 2
 }
