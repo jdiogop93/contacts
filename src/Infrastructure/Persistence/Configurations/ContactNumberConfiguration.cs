@@ -9,6 +9,8 @@ public class ContactNumberConfiguration : IEntityTypeConfiguration<ContactNumber
 {
     public void Configure(EntityTypeBuilder<ContactNumber> builder)
     {
+        builder.ToTable("ContactNumbers");
+
         builder.HasOne(x => x.Contact)
             .WithMany(x => x.Numbers)
             .HasForeignKey(x => x.ContactId);

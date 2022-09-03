@@ -9,5 +9,6 @@ public class Contact : BaseAuditableEntity
     public Address Address { get; set; }
     public string Email { get; set; }
 
-    public List<ContactNumber> Numbers { get; set; } //used to save numbers at the same time of this contact
+    public ICollection<ContactNumber> Numbers { get; set; } //used to save numbers at the same time of this contact
+    public ICollection<ContactGroup> Groups { get; set; }
 }
