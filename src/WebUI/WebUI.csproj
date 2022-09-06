@@ -7,8 +7,8 @@
         <Nullable>enable</Nullable>
         <IsPackable>true</IsPackable>
         <SpaRoot>ClientApp\</SpaRoot>
-        <SpaProxyServerUrl>https://localhost:44447</SpaProxyServerUrl>
-        <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
+        <SpaProxyServerUrl>http://localhost:8080</SpaProxyServerUrl>
+        <SpaProxyLaunchCommand>npm run serve</SpaProxyLaunchCommand>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>efad71c6-743c-4b87-9de8-f26d77146f6d</UserSecretsId>
     </PropertyGroup>
