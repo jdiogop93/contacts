@@ -1,13 +1,9 @@
 export default {
-  title: 'YourCMS',
+  title: 'VueContacts',
   locales: [
     {
       name: 'en',
       text: 'English',
-    },
-    {
-      name: 'pl',
-      text: 'Polski',
     },
   ],
   defaultLocale: 'en',

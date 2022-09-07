@@ -194,7 +194,7 @@ export default {
           'ServerSide',
         ].indexOf(value) !== -1
       },
-      default: 'ClientSide',
+      default: 'ServerSide',
     },
     itemsView: {
       type: Object,

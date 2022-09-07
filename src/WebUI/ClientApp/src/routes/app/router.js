@@ -7,12 +7,20 @@ import Store from './routes/store/Index.vue'
 import storeRoutes from './routes/store/router'
 import Administration from './routes/administration/Index.vue'
 import administrationRoutes from './routes/administration/router'
+import Contacts from './routes/contacts/Index.vue'
+import contactsRoutes from './routes/contacts/router'
 
 let appRoutes = [
   {
     path: 'home',
     name: 'home',
     component: Home,
+  },
+  {
+    path: 'contacts',
+    name: 'contacts',
+    component: Contacts,
+    children: contactsRoutes,
   },
   {
     path: 'cms',

@@ -6,6 +6,73 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/Contacts/list": {
+      "get": {
+        "tags": [
+          "Contacts"
+        ],
+        "operationId": "Contacts_GetContactsWithPagination",
+        "parameters": [
+          {
+            "name": "SortBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "SortDesc",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "RowsPerPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 4
+          },
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfContactListItemDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -52,12 +119,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -88,12 +150,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/TodoItems/{id}": {
@@ -138,12 +195,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
@@ -174,12 +226,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/TodoItems/UpdateItemDetails": {
@@ -223,12 +270,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/TodoLists": {
@@ -248,12 +290,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -284,12 +321,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/TodoLists/{id}": {
@@ -322,12 +354,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       },
       "put": {
         "tags": [
@@ -370,12 +397,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
@@ -406,12 +428,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/WeatherForecast": {
@@ -440,11 +457,57 @@
   },
   "components": {
     "schemas": {
+      "PaginatedListOfContactListItemDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactListItemDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ContactListItemDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "defaultPhoneNumber": {
+            "type": "string"
+          }
+        }
+      },
       "PaginatedListOfTodoItemBriefDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "items": {
+          "data": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TodoItemBriefDto"
@@ -458,7 +521,7 @@
             "type": "integer",
             "format": "int32"
           },
-          "totalCount": {
+          "total": {
             "type": "integer",
             "format": "int32"
           },

@@ -45,7 +45,6 @@
       :server-items-length="totalItems"
       :loading="loading"
       light
-      multi-sort
       dense
     >
       <template
@@ -144,16 +143,16 @@ export default {
     ]),
     params () {
       return {
-        sortBy: this.pagination.sortBy,
-        sortDesc: this.pagination.sortDesc,
+        sortBy: this.pagination.sortBy[0],
+        sortDesc: this.pagination.sortDesc[0],
         rowsPerPage: this.pagination.itemsPerPage,
         page: this.pagination.page,
         search: this.search,
-        filterColumns: this.columnFilters,
-        selectedStatuses: this.selectedStatuses,
-        deleteMode: this.deleteMode,
-        activeColumnName: this.activeColumnName,
-        mode: 'paginate',
+        // filterColumns: this.columnFilters,
+        // selectedStatuses: this.selectedStatuses,
+        // deleteMode: this.deleteMode,
+        // activeColumnName: this.activeColumnName,
+        // mode: 'paginate',
       }
     },
   },

@@ -1,5 +1,5 @@
 export default {
-  url: 'http://127.0.0.1:8000',
+  url: 'https://localhost:5001',
   path: {
     prefix: 'api',
     storage: 'storage',

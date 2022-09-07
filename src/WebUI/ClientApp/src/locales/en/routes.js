@@ -2,6 +2,12 @@ export default {
   home: {
     name: 'Home page',
   },
+  contacts: {
+    name: 'Contacts',
+    list: 'List',
+    contacts: 'Contacts',
+    groups: 'Groups',
+  },
   cms: {
     name: 'CMS',
     settings: 'Settings',

@@ -15,6 +15,86 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
+export interface IContactsClient {
+    getContactsWithPagination(sortBy: string | null | undefined, sortDesc: boolean | null | undefined, rowsPerPage: number | undefined, page: number | undefined, search: string | null | undefined): Observable<PaginatedListOfContactListItemDto>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class ContactsClient implements IContactsClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    getContactsWithPagination(sortBy: string | null | undefined, sortDesc: boolean | null | undefined, rowsPerPage: number | undefined, page: number | undefined, search: string | null | undefined): Observable<PaginatedListOfContactListItemDto> {
+        let url_ = this.baseUrl + "/api/Contacts/list?";
+        if (sortBy !== undefined && sortBy !== null)
+            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
+        if (sortDesc !== undefined && sortDesc !== null)
+            url_ += "SortDesc=" + encodeURIComponent("" + sortDesc) + "&";
+        if (rowsPerPage === null)
+            throw new Error("The parameter 'rowsPerPage' cannot be null.");
+        else if (rowsPerPage !== undefined)
+            url_ += "RowsPerPage=" + encodeURIComponent("" + rowsPerPage) + "&";
+        if (page === null)
+            throw new Error("The parameter 'page' cannot be null.");
+        else if (page !== undefined)
+            url_ += "Page=" + encodeURIComponent("" + page) + "&";
+        if (search !== undefined && search !== null)
+            url_ += "Search=" + encodeURIComponent("" + search) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetContactsWithPagination(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetContactsWithPagination(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PaginatedListOfContactListItemDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PaginatedListOfContactListItemDto>;
+        }));
+    }
+
+    protected processGetContactsWithPagination(response: HttpResponseBase): Observable<PaginatedListOfContactListItemDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PaginatedListOfContactListItemDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface ITodoItemsClient {
     getTodoItemsWithPagination(listId: number | undefined, pageNumber: number | undefined, pageSize: number | undefined): Observable<PaginatedListOfTodoItemBriefDto>;
     create(command: CreateTodoItemCommand): Observable<number>;
@@ -653,11 +733,119 @@ export class WeatherForecastClient implements IWeatherForecastClient {
     }
 }
 
-export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {
-    items?: TodoItemBriefDto[];
+export class PaginatedListOfContactListItemDto implements IPaginatedListOfContactListItemDto {
+    data?: ContactListItemDto[];
     pageNumber?: number;
     totalPages?: number;
-    totalCount?: number;
+    total?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+
+    constructor(data?: IPaginatedListOfContactListItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ContactListItemDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.totalPages = _data["totalPages"];
+            this.total = _data["total"];
+            this.hasPreviousPage = _data["hasPreviousPage"];
+            this.hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): PaginatedListOfContactListItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaginatedListOfContactListItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["totalPages"] = this.totalPages;
+        data["total"] = this.total;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IPaginatedListOfContactListItemDto {
+    data?: ContactListItemDto[];
+    pageNumber?: number;
+    totalPages?: number;
+    total?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class ContactListItemDto implements IContactListItemDto {
+    id?: number;
+    name?: string;
+    defaultPhoneNumber?: string;
+
+    constructor(data?: IContactListItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.defaultPhoneNumber = _data["defaultPhoneNumber"];
+        }
+    }
+
+    static fromJS(data: any): ContactListItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactListItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["defaultPhoneNumber"] = this.defaultPhoneNumber;
+        return data;
+    }
+}
+
+export interface IContactListItemDto {
+    id?: number;
+    name?: string;
+    defaultPhoneNumber?: string;
+}
+
+export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {
+    data?: TodoItemBriefDto[];
+    pageNumber?: number;
+    totalPages?: number;
+    total?: number;
     hasPreviousPage?: boolean;
     hasNextPage?: boolean;
 
@@ -672,14 +860,14 @@ export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItem
 
     init(_data?: any) {
         if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(TodoItemBriefDto.fromJS(item));
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(TodoItemBriefDto.fromJS(item));
             }
             this.pageNumber = _data["pageNumber"];
             this.totalPages = _data["totalPages"];
-            this.totalCount = _data["totalCount"];
+            this.total = _data["total"];
             this.hasPreviousPage = _data["hasPreviousPage"];
             this.hasNextPage = _data["hasNextPage"];
         }
@@ -694,14 +882,14 @@ export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItem
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item.toJSON());
         }
         data["pageNumber"] = this.pageNumber;
         data["totalPages"] = this.totalPages;
-        data["totalCount"] = this.totalCount;
+        data["total"] = this.total;
         data["hasPreviousPage"] = this.hasPreviousPage;
         data["hasNextPage"] = this.hasNextPage;
         return data;
@@ -709,10 +897,10 @@ export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItem
 }
 
 export interface IPaginatedListOfTodoItemBriefDto {
-    items?: TodoItemBriefDto[];
+    data?: TodoItemBriefDto[];
     pageNumber?: number;
     totalPages?: number;
-    totalCount?: number;
+    total?: number;
     hasPreviousPage?: boolean;
     hasNextPage?: boolean;
 }

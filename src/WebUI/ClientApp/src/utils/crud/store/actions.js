@@ -18,7 +18,7 @@ const actions = {
   getItemsServerSide ({ commit, getters, dispatch }, [params]) {
     return new Promise((resolve, reject) => {
       commit('setLoadingStatus', true)
-      Vue.http.post(`${getters.path('i')}/search`, params)
+      Vue.http.get(`${getters.path('i')}`, { params, headers: { 'content-type': 'application/json' } })
         .then((response) => {
           commit('setItemsServerSide', response.body)
           resolve()

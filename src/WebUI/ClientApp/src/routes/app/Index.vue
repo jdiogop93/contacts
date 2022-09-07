@@ -1,19 +1,8 @@
 <template>
   <div>
-    <sidebar
-      :items="sidebarItems"
-      expand-on="click"
-      :lock-sidebar-btn="true"
-      :title="$store.state.title"
-      title-link="/home"
-      :show-logo="true"
-      logo="vue-crud-avatar.png"
-      sidebar-color="secondary"
-      :sidebar-dark="true"
-      title-color="primary"
-      :title-dark="true"
-      nav-color="primary"
-    >
+    <sidebar :items="sidebarItems" expand-on="click" :lock-sidebar-btn="true" :title="$store.state.title"
+      title-link="/home" :show-logo="true" logo="vue-crud-avatar.png" sidebar-color="secondary" :sidebar-dark="true"
+      title-color="primary" :title-dark="true" nav-color="primary">
       <template slot="nav">
         <v-list-item-action>
           <v-icon color="primary">person</v-icon>
@@ -21,21 +10,15 @@
         <v-list-item-title class="white--text">{{ userInfo.name }}</v-list-item-title>
       </template>
     </sidebar>
-    <toolbar
-      :profile-btn="profile"
-      :locales-btn="true"
-      :logout-btn="true"
-      color="secondary"
-      :dark="true"
-    >
+    <toolbar :profile-btn="profile" :locales-btn="true" :logout-btn="true" color="secondary" :dark="true">
       <template slot="left">
         <div class="headline d-none d-md-inline">
           <template v-if="$store.state.app.module !=null">
-              {{ $t('global.routes.' + $store.state.app.module) }}
+            {{ $t('global.routes.' + $store.state.app.module) }}
           </template>
           <template v-if="$store.state.app.page !=null">
-              <v-icon slot="divider">forward</v-icon>
-              {{ $t('global.routes.' + $store.state.app.page) }}
+            <v-icon slot="divider">forward</v-icon>
+            {{ $t('global.routes.' + $store.state.app.page) }}
           </template>
         </div>
       </template>
@@ -56,14 +39,10 @@
         </v-layout>
       </v-container>
     </v-content>
-    <footnote
-      v-if="footer"
-      color="primary"
-      :dark="true"
-    >
+    <footnote v-if="footer" color="primary" :dark="true">
       <template slot="left">
         <a href="https://vue-crud.github.io/" target="_blank" style="color:white;text-decoration:none;">
-          <v-icon color="white">help</v-icon>  vue-crud.github.io
+          <v-icon color="white">help</v-icon> vue-crud.github.io
         </a>
       </template>
       <template slot="center">
@@ -93,6 +72,23 @@ export default {
     profile: true,
     footer: true,
     sidebarItems: [
+      {
+        icon: 'perm_contact_call',
+        text: 'contacts.contacts',
+        model: true,
+        // guard: '',
+        route: '/contacts',
+        children: [
+          {
+            text: 'contacts.list',
+            route: '/list',
+          },
+          {
+            text: 'contacts.groups',
+            route: '/groups',
+          },
+        ],
+      },
       {
         icon: 'view_quilt',
         text: 'cms.name',
@@ -220,21 +216,26 @@ export default {
   padding: 10px 0 0 0;
   background-color: white;
 }
+
 .content {
   min-height: 100vh;
   overflow-x: auto;
   background-color: white;
 }
+
 .main-card {
   background-color: white;
 }
+
 .card-title {
   padding: 0;
 }
+
 .content-container {
   margin-bottom: 100px;
   padding: 0;
 }
+
 .headline {
   padding-bottom: 10px;
 }

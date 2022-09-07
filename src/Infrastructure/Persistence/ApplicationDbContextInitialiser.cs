@@ -3,6 +3,9 @@ using Contacts.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using static AutoMapper.Internal.ExpressionFactory;
+using static Duende.IdentityServer.Models.IdentityResources;
 
 namespace Contacts.Infrastructure.Persistence;
 
@@ -91,7 +94,7 @@ public class ApplicationDbContextInitialiser
         #region Contacts
         if (!_context.Contacts.Any())
         {
-            _context.Contacts.AddRange(new List<Contact>
+            var contactsToAdd = new List<Contact>
             {
                 //1
                 new Contact
@@ -106,8 +109,8 @@ public class ApplicationDbContextInitialiser
                         new ContactNumber
                         {
                             CountryCode = "+351",
-                            PhoneNumber = "960000000",
-                            Type = Domain.Enums.ContactNumberType.WORK
+                            PhoneNumber = "258000000",
+                            Type = Domain.Enums.ContactNumberType.HOME
                         },
                         new ContactNumber
                         {
@@ -124,22 +127,63 @@ public class ApplicationDbContextInitialiser
                     LastName = "Pereira",
                     Initials = "CP",
                     Address = new Domain.ValueObjects.Address("Massarelos", "4901", "Porto", "Portugal"),
-                    Email = "jde93pereira@gmail.com",
-                    Numbers = new List<ContactNumber>
-                    {
-                        new ContactNumber
-                        {
-                            CountryCode = "+351",
-                            PhoneNumber = "258000999",
-                            Type = Domain.Enums.ContactNumberType.HOME
-                        }
-                    }
+                    Email = "jde93pereira@gmail.com"
                 }
-            });
+            };
+
+            int numberOfContactsToCreate = 123;
+            for (int i = 0; i < numberOfContactsToCreate; i++)
+            {
+                int idx = (i + 1);
+                var phone = string.Format("{0:000}", idx);
+
+                var c = new Contact();
+                c.FirstName = $"Nome{idx}";
+                c.LastName = $"Apelido{idx}";
+                c.Initials = $"NA"; //TODO
+                c.Address = new Domain.ValueObjects.Address("Foz", "4900", "Porto", "Portugal");
+                c.Email = $"na{idx}@teste.com";
+                c.Numbers = new List<ContactNumber>
+                {
+                    new ContactNumber
+                    {
+                        CountryCode = "+351",
+                        PhoneNumber = $"960000{idx}",
+                        Type = Domain.Enums.ContactNumberType.MOBILE
+                    }
+                };
+                contactsToAdd.Add(c);
+            }
+
+            _context.Contacts.AddRange(contactsToAdd);
 
             await _context.SaveChangesAsync();
         }
         #endregion
 
     }
+
+
+    //private Contact GenerateContactByIndex()
+    //{
+    //    return new Contact
+    //    {
+    //        FirstName = $"Nome",
+    //        LastName = $"Apelido",
+    //        Initials = $"N",
+    //        Address = new Domain.ValueObjects.Address("Foz", "4900", "Porto", "Portugal"),
+    //        Email = $"na@teste.com",
+    //        Numbers = new List<ContactNumber>
+    //        {
+    //            new ContactNumber
+    //            {
+    //                CountryCode = "+351",
+    //                PhoneNumber = $"961111111",
+    //                Type = Domain.Enums.ContactNumberType.MOBILE
+    //            }
+    //        }
+    //    };
+    //}
+
+
 }

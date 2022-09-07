@@ -1,5 +1,5 @@
 export default {
-  api: 'http://127.0.0.1:8000/api',
+  api: 'https://localhost:5001/api',
   prefix: 'auth',
   paths: {
     login: 'login',

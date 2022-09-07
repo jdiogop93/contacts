@@ -35,7 +35,7 @@ public class ContactConfiguration : IEntityTypeConfiguration<Contact>
             .HasMaxLength(200);
 
         builder.Property(t => t.Initials)
-            .HasMaxLength(2);
+            .HasMaxLength(5);
 
         builder.OwnsOne(x => x.Address, cb =>
         {

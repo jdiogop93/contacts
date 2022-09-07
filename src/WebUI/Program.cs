@@ -1,11 +1,21 @@
 using Contacts.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using static System.Net.Mime.MediaTypeNames;
 
+var corsPolicy = "CorsPolicy";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebUIServices();
+
+builder.Services.AddCors(opt => opt.AddPolicy(corsPolicy, c =>
+{
+    c.WithOrigins("http://localhost:8080")
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+}));
 
 var app = builder.Build();
 
@@ -40,6 +50,7 @@ app.UseSwaggerUi3(settings =>
 });
 
 app.UseRouting();
+app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
 app.UseIdentityServer();
