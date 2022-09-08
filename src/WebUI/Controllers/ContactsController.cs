@@ -1,5 +1,7 @@
 ﻿using Contacts.Application.Common.Models;
+using Contacts.Application.Contacts.Commands.CreateContact;
 using Contacts.Application.Contacts.Queries.GetContactsWithPagination;
+using Contacts.Application.TodoLists.Commands.CreateTodoList;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,8 +19,11 @@ public class ContactsController : ApiControllerBase
         _logger = logger;
     }
 
-
-    //[HttpPost("list")]
+    /// <summary>
+    /// get contacts list
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
     [HttpGet("list")]
     public async Task<ActionResult<PaginatedList<ContactListItemDto>>> GetContactsWithPagination([FromQuery] GetContactsWithPaginationQuery query)
     {
@@ -32,6 +37,18 @@ public class ContactsController : ApiControllerBase
             _logger.LogError("ERROR: contacts/list", ex);
             throw;
         }
+    }
+
+
+    /// <summary>
+    /// create contact
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ActionResult<int>> Create(CreateContactCommand command)
+    {
+        return await Mediator.Send(command);
     }
 
 }

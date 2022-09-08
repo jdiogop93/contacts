@@ -7,4 +7,5 @@ public class ContactNumber : BaseAuditableEntity
     public string CountryCode { get; set; }
     public string PhoneNumber { get; set; }
     public ContactNumberType Type { get; set; }
+    public bool Default { get; set; }
 }

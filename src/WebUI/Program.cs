@@ -1,5 +1,6 @@
 using Contacts.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Namotion.Reflection;
 using static System.Net.Mime.MediaTypeNames;
 
 var corsPolicy = "CorsPolicy";
@@ -47,6 +48,7 @@ app.UseSwaggerUi3(settings =>
 {
     settings.Path = "/api";
     settings.DocumentPath = "/api/specification.json";
+    //settings.EnableTryItOut = true;
 });
 
 app.UseRouting();

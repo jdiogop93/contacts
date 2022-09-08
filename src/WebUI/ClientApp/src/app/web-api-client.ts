@@ -17,6 +17,7 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IContactsClient {
     getContactsWithPagination(sortBy: string | null | undefined, sortDesc: boolean | null | undefined, rowsPerPage: number | undefined, page: number | undefined, search: string | null | undefined): Observable<PaginatedListOfContactListItemDto>;
+    create(command: CreateContactCommand): Observable<number>;
 }
 
 @Injectable({
@@ -84,6 +85,59 @@ export class ContactsClient implements IContactsClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = PaginatedListOfContactListItemDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    create(command: CreateContactCommand): Observable<number> {
+        let url_ = this.baseUrl + "/api/Contacts";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -839,6 +893,132 @@ export interface IContactListItemDto {
     id?: number;
     name?: string;
     defaultPhoneNumber?: string;
+}
+
+export class CreateContactCommand implements ICreateContactCommand {
+    firstName?: string;
+    lastName?: string;
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+    email?: string;
+    numbers?: CreateContactNumberItemDto[];
+
+    constructor(data?: ICreateContactCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.street = _data["street"];
+            this.zipCode = _data["zipCode"];
+            this.city = _data["city"];
+            this.country = _data["country"];
+            this.email = _data["email"];
+            if (Array.isArray(_data["numbers"])) {
+                this.numbers = [] as any;
+                for (let item of _data["numbers"])
+                    this.numbers!.push(CreateContactNumberItemDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateContactCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateContactCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["street"] = this.street;
+        data["zipCode"] = this.zipCode;
+        data["city"] = this.city;
+        data["country"] = this.country;
+        data["email"] = this.email;
+        if (Array.isArray(this.numbers)) {
+            data["numbers"] = [];
+            for (let item of this.numbers)
+                data["numbers"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ICreateContactCommand {
+    firstName?: string;
+    lastName?: string;
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+    email?: string;
+    numbers?: CreateContactNumberItemDto[];
+}
+
+export class CreateContactNumberItemDto implements ICreateContactNumberItemDto {
+    countryCode?: string;
+    phoneNumber?: string;
+    type?: ContactNumberTypeEnum;
+    default?: boolean;
+
+    constructor(data?: ICreateContactNumberItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.countryCode = _data["countryCode"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.type = _data["type"];
+            this.default = _data["default"];
+        }
+    }
+
+    static fromJS(data: any): CreateContactNumberItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateContactNumberItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["countryCode"] = this.countryCode;
+        data["phoneNumber"] = this.phoneNumber;
+        data["type"] = this.type;
+        data["default"] = this.default;
+        return data;
+    }
+}
+
+export interface ICreateContactNumberItemDto {
+    countryCode?: string;
+    phoneNumber?: string;
+    type?: ContactNumberTypeEnum;
+    default?: boolean;
+}
+
+export enum ContactNumberTypeEnum {
+    HOME = 0,
+    MOBILE = 1,
+    WORK = 2,
 }
 
 export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {

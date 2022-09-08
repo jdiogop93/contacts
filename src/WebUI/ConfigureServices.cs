@@ -35,13 +35,15 @@ public static class ConfigureServices
         services.AddOpenApiDocument(configure =>
         {
             configure.Title = "Contacts API";
-            configure.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
-            {
-                Type = OpenApiSecuritySchemeType.ApiKey,
-                Name = "Authorization",
-                In = OpenApiSecurityApiKeyLocation.Header,
-                Description = "Type into the textbox: Bearer {your JWT token}."
-            });
+
+            ////to disable authorization at swagger interface
+            //configure.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+            //{
+            //    Type = OpenApiSecuritySchemeType.ApiKey,
+            //    Name = "Authorization",
+            //    In = OpenApiSecurityApiKeyLocation.Header,
+            //    Description = "Type into the textbox: Bearer {your JWT token}."
+            //});
 
             configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
         });

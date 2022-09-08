@@ -27,5 +27,6 @@ public class ContactNumberConfiguration : IEntityTypeConfiguration<ContactNumber
                 v => v.ToString(),
                 v => (ContactNumberType)Enum.Parse(typeof(ContactNumberType), v));
 
+        builder.Property(t => t.Default);
     }
 }

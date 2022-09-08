@@ -116,7 +116,8 @@ public class ApplicationDbContextInitialiser
                         {
                             CountryCode = "+48",
                             PhoneNumber = "0011223344",
-                            Type = Domain.Enums.ContactNumberType.MOBILE
+                            Type = Domain.Enums.ContactNumberType.MOBILE,
+                            Default = true
                         }
                     }
                 },
@@ -140,7 +141,7 @@ public class ApplicationDbContextInitialiser
                 var c = new Contact();
                 c.FirstName = $"Nome{idx}";
                 c.LastName = $"Apelido{idx}";
-                c.Initials = $"NA"; //TODO
+                c.Initials = $"NA{idx}";
                 c.Address = new Domain.ValueObjects.Address("Foz", "4900", "Porto", "Portugal");
                 c.Email = $"na{idx}@teste.com";
                 c.Numbers = new List<ContactNumber>
@@ -149,7 +150,8 @@ public class ApplicationDbContextInitialiser
                     {
                         CountryCode = "+351",
                         PhoneNumber = $"960000{idx}",
-                        Type = Domain.Enums.ContactNumberType.MOBILE
+                        Type = Domain.Enums.ContactNumberType.MOBILE,
+                        Default = true
                     }
                 };
                 contactsToAdd.Add(c);
