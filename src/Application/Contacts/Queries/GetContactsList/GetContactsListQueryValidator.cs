@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace Contacts.Application.Contacts.Queries.GetContactsWithPagination;
+namespace Contacts.Application.Contacts.Queries.GetContactsList;
 
-public class GetContactsWithPaginationQueryValidator : AbstractValidator<GetContactsWithPaginationQuery>
+public class GetContactsListQueryValidator : AbstractValidator<GetContactsListQuery>
 {
-    public GetContactsWithPaginationQueryValidator()
+    public GetContactsListQueryValidator()
     {
         RuleFor(x => x.Page)
             .GreaterThanOrEqualTo(1).WithMessage("PageNumber at least greater than or equal to 1.");

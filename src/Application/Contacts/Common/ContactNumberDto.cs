@@ -1,8 +1,6 @@
-﻿using Contacts.Application.Contacts.Commands.Common;
+﻿namespace Contacts.Application.Contacts.Commands.Common;
 
-namespace Contacts.Application.Contacts.Commands.CreateContact;
-
-public class CreateContactNumberItemDto
+public class ContactNumberDto
 {
     public string CountryCode { get; set; }
     public string PhoneNumber { get; set; }

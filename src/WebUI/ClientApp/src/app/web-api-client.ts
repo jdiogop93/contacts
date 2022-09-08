@@ -16,8 +16,9 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IContactsClient {
-    getContactsWithPagination(sortBy: string | null | undefined, sortDesc: boolean | null | undefined, rowsPerPage: number | undefined, page: number | undefined, search: string | null | undefined): Observable<PaginatedListOfContactListItemDto>;
+    getList(sortBy: string | null | undefined, sortDesc: boolean | null | undefined, rowsPerPage: number | undefined, page: number | undefined, search: string | null | undefined): Observable<PaginatedListOfContactListItemDto>;
     create(command: CreateContactCommand): Observable<number>;
+    get(id: number): Observable<ContactItemDto>;
 }
 
 @Injectable({
@@ -33,7 +34,7 @@ export class ContactsClient implements IContactsClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    getContactsWithPagination(sortBy: string | null | undefined, sortDesc: boolean | null | undefined, rowsPerPage: number | undefined, page: number | undefined, search: string | null | undefined): Observable<PaginatedListOfContactListItemDto> {
+    getList(sortBy: string | null | undefined, sortDesc: boolean | null | undefined, rowsPerPage: number | undefined, page: number | undefined, search: string | null | undefined): Observable<PaginatedListOfContactListItemDto> {
         let url_ = this.baseUrl + "/api/Contacts/list?";
         if (sortBy !== undefined && sortBy !== null)
             url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
@@ -60,11 +61,11 @@ export class ContactsClient implements IContactsClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetContactsWithPagination(response_);
+            return this.processGetList(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetContactsWithPagination(response_ as any);
+                    return this.processGetList(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<PaginatedListOfContactListItemDto>;
                 }
@@ -73,7 +74,7 @@ export class ContactsClient implements IContactsClient {
         }));
     }
 
-    protected processGetContactsWithPagination(response: HttpResponseBase): Observable<PaginatedListOfContactListItemDto> {
+    protected processGetList(response: HttpResponseBase): Observable<PaginatedListOfContactListItemDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -138,6 +139,57 @@ export class ContactsClient implements IContactsClient {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    get(id: number): Observable<ContactItemDto> {
+        let url_ = this.baseUrl + "/api/Contacts/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ContactItemDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ContactItemDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<ContactItemDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ContactItemDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -903,7 +955,7 @@ export class CreateContactCommand implements ICreateContactCommand {
     city?: string;
     country?: string;
     email?: string;
-    numbers?: CreateContactNumberItemDto[];
+    numbers?: ContactNumberDto[];
 
     constructor(data?: ICreateContactCommand) {
         if (data) {
@@ -926,7 +978,7 @@ export class CreateContactCommand implements ICreateContactCommand {
             if (Array.isArray(_data["numbers"])) {
                 this.numbers = [] as any;
                 for (let item of _data["numbers"])
-                    this.numbers!.push(CreateContactNumberItemDto.fromJS(item));
+                    this.numbers!.push(ContactNumberDto.fromJS(item));
             }
         }
     }
@@ -964,16 +1016,16 @@ export interface ICreateContactCommand {
     city?: string;
     country?: string;
     email?: string;
-    numbers?: CreateContactNumberItemDto[];
+    numbers?: ContactNumberDto[];
 }
 
-export class CreateContactNumberItemDto implements ICreateContactNumberItemDto {
+export class ContactNumberDto implements IContactNumberDto {
     countryCode?: string;
     phoneNumber?: string;
     type?: ContactNumberTypeEnum;
     default?: boolean;
 
-    constructor(data?: ICreateContactNumberItemDto) {
+    constructor(data?: IContactNumberDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -991,9 +1043,9 @@ export class CreateContactNumberItemDto implements ICreateContactNumberItemDto {
         }
     }
 
-    static fromJS(data: any): CreateContactNumberItemDto {
+    static fromJS(data: any): ContactNumberDto {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateContactNumberItemDto();
+        let result = new ContactNumberDto();
         result.init(data);
         return result;
     }
@@ -1008,7 +1060,7 @@ export class CreateContactNumberItemDto implements ICreateContactNumberItemDto {
     }
 }
 
-export interface ICreateContactNumberItemDto {
+export interface IContactNumberDto {
     countryCode?: string;
     phoneNumber?: string;
     type?: ContactNumberTypeEnum;
@@ -1019,6 +1071,70 @@ export enum ContactNumberTypeEnum {
     HOME = 0,
     MOBILE = 1,
     WORK = 2,
+}
+
+export class ContactItemDto implements IContactItemDto {
+    id?: number;
+    name?: string;
+    email?: string;
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+    defaultPhoneNumber?: string;
+
+    constructor(data?: IContactItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.email = _data["email"];
+            this.street = _data["street"];
+            this.zipCode = _data["zipCode"];
+            this.city = _data["city"];
+            this.country = _data["country"];
+            this.defaultPhoneNumber = _data["defaultPhoneNumber"];
+        }
+    }
+
+    static fromJS(data: any): ContactItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["email"] = this.email;
+        data["street"] = this.street;
+        data["zipCode"] = this.zipCode;
+        data["city"] = this.city;
+        data["country"] = this.country;
+        data["defaultPhoneNumber"] = this.defaultPhoneNumber;
+        return data;
+    }
+}
+
+export interface IContactItemDto {
+    id?: number;
+    name?: string;
+    email?: string;
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+    defaultPhoneNumber?: string;
 }
 
 export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {

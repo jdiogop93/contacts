@@ -7,9 +7,10 @@ using Contacts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Contacts.Application.Contacts.Queries.GetContactsWithPagination;
+namespace Contacts.Application.Contacts.Queries.GetContactsList;
 
-public record GetContactsWithPaginationQuery : IRequest<PaginatedList<ContactListItemDto>>
+//[Authorize]
+public record GetContactsListQuery : IRequest<PaginatedList<ContactListItemDto>>
 {
     public string? SortBy { get; set; }
     public bool? SortDesc { get; set; }
@@ -18,18 +19,18 @@ public record GetContactsWithPaginationQuery : IRequest<PaginatedList<ContactLis
     public string? Search { get; set; }
 }
 
-public class GetContactsWithPaginationQueryHandler : IRequestHandler<GetContactsWithPaginationQuery, PaginatedList<ContactListItemDto>>
+public class GetContactsListQueryHandler : IRequestHandler<GetContactsListQuery, PaginatedList<ContactListItemDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
 
-    public GetContactsWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetContactsListQueryHandler(IApplicationDbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
     }
 
-    public async Task<PaginatedList<ContactListItemDto>> Handle(GetContactsWithPaginationQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<ContactListItemDto>> Handle(GetContactsListQuery request, CancellationToken cancellationToken)
     {
         #region the best way - less code repetitions
         //var query = _context.Contacts;

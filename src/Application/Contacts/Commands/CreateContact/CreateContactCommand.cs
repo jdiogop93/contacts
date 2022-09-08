@@ -1,4 +1,5 @@
 ﻿using Contacts.Application.Common.Interfaces;
+using Contacts.Application.Contacts.Commands.Common;
 using Contacts.Domain.Entities;
 using Contacts.Domain.Enums;
 using MediatR;
@@ -20,7 +21,7 @@ public record CreateContactCommand : IRequest<int>
     #endregion
 
     public string Email { get; set; }
-    public IList<CreateContactNumberItemDto> Numbers { get; set; }
+    public IList<ContactNumberDto> Numbers { get; set; }
 }
 
 
