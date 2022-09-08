@@ -1,8 +1,8 @@
 ﻿using Contacts.Application.Common.Models;
 using Contacts.Application.Contacts.Commands.CreateContact;
+using Contacts.Application.Contacts.Commands.DisableContact;
 using Contacts.Application.Contacts.Queries.GetContact;
 using Contacts.Application.Contacts.Queries.GetContactsList;
-using Contacts.Application.TodoLists.Queries.GetTodos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,7 +60,20 @@ public class ContactsController : ApiControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<ContactItemDto>> Get(int id)
     {
-        return await Mediator.Send(new GetContactQuery { Id = id });
+        return await Mediator.Send(new GetContactQuery(id));
+    }
+
+
+    /// <summary>
+    /// disable contact
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpPatch("disable/{id}")]
+    public async Task<ActionResult> Disable(int id)
+    {
+        await Mediator.Send(new DisableContactCommand(id));
+        return Ok();
     }
 
 }

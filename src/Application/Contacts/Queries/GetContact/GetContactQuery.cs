@@ -8,10 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Contacts.Application.Contacts.Queries.GetContact;
 
 //[Authorize]
-public record GetContactQuery : IRequest<ContactItemDto>
-{
-    public int Id { get; set; }
-}
+public record GetContactQuery(int Id) : IRequest<ContactItemDto>;
 
 public class GetContactQueryHandler : IRequestHandler<GetContactQuery, ContactItemDto>
 {
@@ -27,8 +24,9 @@ public class GetContactQueryHandler : IRequestHandler<GetContactQuery, ContactIt
     public async Task<ContactItemDto> Handle(GetContactQuery request, CancellationToken cancellationToken)
     {
         var entity = await _context.Contacts
+            .Where(l => l.Id == request.Id && l.Active)
             .Include(x => x.Numbers.Where(n => n.Default).Take(1))
-            .FirstOrDefaultAsync(x => x.Id == request.Id);
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (entity == null)
         {
