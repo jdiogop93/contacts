@@ -14,10 +14,6 @@ public class ContactGroupConfiguration : IEntityTypeConfiguration<ContactGroup>
         builder.Property(t => t.Name)
             .HasMaxLength(200);
 
-        builder.HasMany(p => p.Contacts)
-            .WithMany(p => p.Groups)
-            .UsingEntity(j => j.ToTable("ContactGroupsContacts"));
-
         builder.Property(x => x.Created);
 
         builder.Property(x => x.LastModified)

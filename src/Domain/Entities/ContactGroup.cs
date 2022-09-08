@@ -4,5 +4,5 @@ public class ContactGroup : BaseAuditableEntity
 {
     public string Name { get; set; }
 
-    public ICollection<Contact> Contacts { get; set; }
+    public ICollection<ContactGroupContact> Contacts { get; set; }
 }
