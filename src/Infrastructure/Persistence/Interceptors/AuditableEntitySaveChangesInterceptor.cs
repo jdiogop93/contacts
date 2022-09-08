@@ -46,7 +46,7 @@ public class AuditableEntitySaveChangesInterceptor : SaveChangesInterceptor
                 entry.Entity.Active = true;
             } 
 
-            if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
+            if (entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
             {
                 //entry.Entity.LastModifiedBy = _currentUserService.UserId;
                 entry.Entity.LastModified = _dateTime.UtcNow;

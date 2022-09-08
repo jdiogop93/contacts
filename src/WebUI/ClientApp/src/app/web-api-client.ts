@@ -15,6 +15,77 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
+export interface IContactGroupsClient {
+    create(command: CreateContactGroupCommand): Observable<number>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class ContactGroupsClient implements IContactGroupsClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    create(command: CreateContactGroupCommand): Observable<number> {
+        let url_ = this.baseUrl + "/api/ContactGroups";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface IContactsClient {
     getList(sortBy: string | null | undefined, sortDesc: boolean | null | undefined, rowsPerPage: number | undefined, page: number | undefined, search: string | null | undefined): Observable<PaginatedListOfContactListItemDto>;
     create(command: CreateContactCommand): Observable<number>;
@@ -887,6 +958,54 @@ export class WeatherForecastClient implements IWeatherForecastClient {
         }
         return _observableOf(null as any);
     }
+}
+
+export class CreateContactGroupCommand implements ICreateContactGroupCommand {
+    name?: string;
+    contactsIds?: number[];
+
+    constructor(data?: ICreateContactGroupCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            if (Array.isArray(_data["contactsIds"])) {
+                this.contactsIds = [] as any;
+                for (let item of _data["contactsIds"])
+                    this.contactsIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateContactGroupCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateContactGroupCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        if (Array.isArray(this.contactsIds)) {
+            data["contactsIds"] = [];
+            for (let item of this.contactsIds)
+                data["contactsIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ICreateContactGroupCommand {
+    name?: string;
+    contactsIds?: number[];
 }
 
 export class PaginatedListOfContactListItemDto implements IPaginatedListOfContactListItemDto {

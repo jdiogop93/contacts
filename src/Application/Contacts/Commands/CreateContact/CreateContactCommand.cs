@@ -21,7 +21,7 @@ public record CreateContactCommand : IRequest<int>
     #endregion
 
     public string Email { get; set; }
-    public IList<ContactNumberDto> Numbers { get; set; }
+    public HashSet<ContactNumberDto> Numbers { get; set; }
 }
 
 

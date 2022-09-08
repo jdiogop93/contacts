@@ -11,8 +11,10 @@ public class ContactGroupConfiguration : IEntityTypeConfiguration<ContactGroup>
     {
         builder.ToTable("ContactGroups");
 
-        builder.Property(t => t.Name)
+        builder.Property(x => x.Name)
             .HasMaxLength(200);
+        builder.HasIndex(x => x.Name)
+            .IsUnique();
 
         builder.Property(x => x.Created);
 

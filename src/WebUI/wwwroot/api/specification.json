@@ -6,6 +6,39 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/ContactGroups": {
+      "post": {
+        "tags": [
+          "ContactGroups"
+        ],
+        "operationId": "ContactGroups_Create",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContactGroupCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Contacts/list": {
       "get": {
         "tags": [
@@ -555,6 +588,22 @@
   },
   "components": {
     "schemas": {
+      "CreateContactGroupCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "contactsIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
       "PaginatedListOfContactListItemDto": {
         "type": "object",
         "additionalProperties": false,
