@@ -58,5 +58,15 @@ public class ContactConfiguration : IEntityTypeConfiguration<Contact>
 
         builder.Property(t => t.Email)
             .HasMaxLength(200);
+
+        builder.Property(x => x.Created);
+
+        builder.Property(x => x.LastModified)
+            .IsRequired(false);
+
+        builder.Property(x => x.DisabledAt)
+            .IsRequired(false);
+
+        builder.Property(x => x.Active);
     }
 }

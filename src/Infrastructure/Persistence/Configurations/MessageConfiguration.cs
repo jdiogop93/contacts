@@ -35,5 +35,15 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 
         builder.Property(t => t.EmailsBcc)
             .IsRequired(false);
+
+        builder.Property(x => x.Created);
+
+        builder.Property(x => x.LastModified)
+            .IsRequired(false);
+
+        builder.Property(x => x.DisabledAt)
+            .IsRequired(false);
+
+        builder.Property(x => x.Active);
     }
 }

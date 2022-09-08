@@ -17,5 +17,15 @@ public class ContactGroupConfiguration : IEntityTypeConfiguration<ContactGroup>
         builder.HasMany(p => p.Contacts)
             .WithMany(p => p.Groups)
             .UsingEntity(j => j.ToTable("ContactGroupsContacts"));
+
+        builder.Property(x => x.Created);
+
+        builder.Property(x => x.LastModified)
+            .IsRequired(false);
+
+        builder.Property(x => x.DisabledAt)
+            .IsRequired(false);
+
+        builder.Property(x => x.Active);
     }
 }
