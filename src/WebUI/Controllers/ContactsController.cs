@@ -31,6 +31,7 @@ public class ContactsController : ApiControllerBase
         try
         {
             var a = await Mediator.Send(query);
+
             return a;
         }
         catch (Exception ex)
@@ -73,6 +74,7 @@ public class ContactsController : ApiControllerBase
     public async Task<ActionResult> Disable(int id)
     {
         await Mediator.Send(new DisableContactCommand(id));
+
         return Ok();
     }
 

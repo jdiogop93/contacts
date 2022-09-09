@@ -1,4 +1,5 @@
 ﻿using Contacts.Application.ContactGroups.Commands.CreateContactGroup;
+using Contacts.Application.ContactGroups.Commands.UpdateContactGroup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,26 +17,6 @@ public class ContactGroupsController : ApiControllerBase
         _logger = logger;
     }
 
-    ///// <summary>
-    ///// get contacts list
-    ///// </summary>
-    ///// <param name="query"></param>
-    ///// <returns></returns>
-    //[HttpGet("list")]
-    //public async Task<ActionResult<PaginatedList<ContactListItemDto>>> GetList([FromQuery] GetContactsListQuery query)
-    //{
-    //    try
-    //    {
-    //        var a = await Mediator.Send(query);
-    //        return a;
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogError("ERROR: contacts/list", ex);
-    //        throw;
-    //    }
-    //}
-
 
     /// <summary>
     /// create contact group (with contacts)
@@ -49,27 +30,23 @@ public class ContactGroupsController : ApiControllerBase
     }
 
 
-    ///// <summary>
-    ///// get contact
-    ///// </summary>
-    ///// <returns></returns>
-    //[HttpGet("{id}")]
-    //public async Task<ActionResult<ContactItemDto>> Get(int id)
-    //{
-    //    return await Mediator.Send(new GetContactQuery(id));
-    //}
+    /// <summary>
+    /// update group (with contacts)
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    [HttpPut("{id}")]
+    public async Task<ActionResult> Update(int id, UpdateContactGroupCommand command)
+    {
+        if (id != command.Id)
+        {
+            return NotFound();
+        }
 
+        await Mediator.Send(command);
 
-    ///// <summary>
-    ///// disable contact
-    ///// </summary>
-    ///// <param name="id"></param>
-    ///// <returns></returns>
-    //[HttpPatch("disable/{id}")]
-    //public async Task<ActionResult> Disable(int id)
-    //{
-    //    await Mediator.Send(new DisableContactCommand(id));
-    //    return Ok();
-    //}
+        return Ok();
+    }
 
 }

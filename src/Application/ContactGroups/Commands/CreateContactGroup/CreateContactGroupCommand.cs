@@ -24,6 +24,7 @@ public class CreateContactGroupCommandHandler : IRequestHandler<CreateContactGro
 
     public async Task<int> Handle(CreateContactGroupCommand request, CancellationToken cancellationToken)
     {
+        #region validates the existance of all contacts
         var contacts = _context.Contacts
             .Where(x => request.ContactsIds.Any(id => id == x.Id) && x.Active)
             .ToList();
@@ -33,6 +34,7 @@ public class CreateContactGroupCommandHandler : IRequestHandler<CreateContactGro
             var idContactNotFound = request.ContactsIds.FirstOrDefault(id => !contacts.Any(c => c.Id == id));
             throw new NotFoundException(nameof(Contact), idContactNotFound);
         }
+        #endregion
 
         var currentTime = DateTime.UtcNow;
 
@@ -49,8 +51,12 @@ public class CreateContactGroupCommandHandler : IRequestHandler<CreateContactGro
                 ContactGroup = group,
                 Contact = x,
                 Created = currentTime
-            });
-        _context.ContactGroupContacts.AddRange(contactGroupContacts);
+            })
+            .ToList();
+        if (contactGroupContacts.Count > 0)
+        {
+            _context.ContactGroupContacts.AddRange(contactGroupContacts);
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
 
