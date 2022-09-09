@@ -13,7 +13,8 @@ public class ContactsController : ApiControllerBase
 {
     private readonly ILogger<ContactsController> _logger;
 
-    public ContactsController(
+    public ContactsController
+    (
         ILogger<ContactsController> logger
     )
     {

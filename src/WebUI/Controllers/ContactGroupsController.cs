@@ -10,7 +10,8 @@ public class ContactGroupsController : ApiControllerBase
 {
     private readonly ILogger<ContactGroupsController> _logger;
 
-    public ContactGroupsController(
+    public ContactGroupsController
+    (
         ILogger<ContactGroupsController> logger
     )
     {

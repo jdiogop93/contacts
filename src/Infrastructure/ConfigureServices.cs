@@ -42,6 +42,7 @@ public static class ConfigureServices
             .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
         services.AddTransient<IDateTime, DateTimeService>();
+        services.AddTransient<IMailService, MailService>();
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
 
