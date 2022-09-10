@@ -1,8 +1,8 @@
-﻿using Contacts.Application.ContactGroups.Commands.CreateContactGroup;
+﻿using ContactGroups.Application.ContactGroups.Commands.DisableContactGroup;
+using Contacts.Application.ContactGroups.Commands.CreateContactGroup;
 using Contacts.Application.ContactGroups.Commands.UpdateContactGroup;
 using Contacts.Application.ContactGroups.Common;
-using Contacts.Application.Contacts.Queries.GetContact;
-using Contacts.Application.Contacts.Queries.GetContactGroup;
+using Contacts.Application.ContactGroups.Queries.GetContactGroup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +23,7 @@ public class ContactGroupsController : ApiControllerBase
 
 
     /// <summary>
-    /// create contact group (with contacts)
+    /// create group (with contacts)
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
@@ -35,7 +35,7 @@ public class ContactGroupsController : ApiControllerBase
 
 
     /// <summary>
-    /// get contact group
+    /// get group
     /// </summary>
     /// <returns></returns>
     [HttpGet("{id}")]
@@ -60,6 +60,20 @@ public class ContactGroupsController : ApiControllerBase
         }
 
         await Mediator.Send(command);
+
+        return Ok();
+    }
+
+
+    /// <summary>
+    /// disable group
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpPatch("disable/{id}")]
+    public async Task<ActionResult> Disable(int id)
+    {
+        await Mediator.Send(new DisableContactGroupCommand(id));
 
         return Ok();
     }

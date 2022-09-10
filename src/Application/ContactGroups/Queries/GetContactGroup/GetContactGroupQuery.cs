@@ -8,7 +8,7 @@ using Contacts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Contacts.Application.Contacts.Queries.GetContactGroup;
+namespace Contacts.Application.ContactGroups.Queries.GetContactGroup;
 
 //[Authorize]
 public record GetContactGroupQuery(int Id) : IRequest<ContactGroupDto>;
