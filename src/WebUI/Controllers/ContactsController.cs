@@ -1,4 +1,5 @@
 ﻿using Contacts.Application.Common.Models;
+using Contacts.Application.Contacts.Commands;
 using Contacts.Application.Contacts.Commands.CreateContact;
 using Contacts.Application.Contacts.Commands.DisableContact;
 using Contacts.Application.Contacts.Commands.UpdateContact;
@@ -65,7 +66,15 @@ public class ContactsController : ApiControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<ContactItemDto>> Get(int id)
     {
-        return await Mediator.Send(new GetContactQuery(id));
+        try
+        {
+            return await Mediator.Send(new GetContactQuery(id));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ISTO É UM TESTE");
+            throw;
+        }
     }
 
 

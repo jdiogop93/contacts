@@ -1,8 +1,11 @@
-﻿using ContactGroups.Application.ContactGroups.Commands.DisableContactGroup;
+﻿using Contacts.Application.Common.Models;
 using Contacts.Application.ContactGroups.Commands.CreateContactGroup;
+using Contacts.Application.ContactGroups.Commands.DisableContactGroup;
 using Contacts.Application.ContactGroups.Commands.UpdateContactGroup;
 using Contacts.Application.ContactGroups.Common;
 using Contacts.Application.ContactGroups.Queries.GetContactGroup;
+using Contacts.Application.ContactGroups.Queries.GetContactGroupsList;
+using Contacts.Application.Contacts.Queries.GetContactsList;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +22,28 @@ public class ContactGroupsController : ApiControllerBase
     )
     {
         _logger = logger;
+    }
+
+
+    /// <summary>
+    /// get groups list
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    [HttpGet("list")]
+    public async Task<ActionResult<PaginatedList<ContactGroupListItemDto>>> GetList([FromQuery] GetContactGroupsListQuery query)
+    {
+        try
+        {
+            var a = await Mediator.Send(query);
+
+            return a;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("ERROR: contactgroups/list", ex);
+            throw;
+        }
     }
 
 

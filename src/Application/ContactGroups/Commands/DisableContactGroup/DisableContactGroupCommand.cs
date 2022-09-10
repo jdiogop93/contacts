@@ -4,7 +4,7 @@ using Contacts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ContactGroups.Application.ContactGroups.Commands.DisableContactGroup;
+namespace Contacts.Application.ContactGroups.Commands.DisableContactGroup;
 
 public record DisableContactGroupCommand(int Id) : IRequest;
 
