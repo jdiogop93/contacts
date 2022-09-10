@@ -1,6 +1,7 @@
 ﻿using Contacts.Application.Common.Models;
 using Contacts.Application.Contacts.Commands.CreateContact;
 using Contacts.Application.Contacts.Commands.DisableContact;
+using Contacts.Application.Contacts.Commands.UpdateContact;
 using Contacts.Application.Contacts.Queries.GetContact;
 using Contacts.Application.Contacts.Queries.GetContactsList;
 using Microsoft.AspNetCore.Authorization;
@@ -63,6 +64,26 @@ public class ContactsController : ApiControllerBase
     public async Task<ActionResult<ContactItemDto>> Get(int id)
     {
         return await Mediator.Send(new GetContactQuery(id));
+    }
+
+
+    /// <summary>
+    /// update contact
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    [HttpPut("{id}")]
+    public async Task<ActionResult> Update(int id, UpdateContactCommand command)
+    {
+        if (id != command.Id)
+        {
+            return BadRequest();
+        }
+
+        await Mediator.Send(command);
+
+        return NoContent();
     }
 
 

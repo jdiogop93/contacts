@@ -1,5 +1,6 @@
 ﻿using Contacts.Application.Common.Interfaces;
 using Contacts.Application.Contacts.Commands.Common;
+using Contacts.Application.Contacts.Common;
 using Contacts.Domain.Entities;
 using Contacts.Domain.Enums;
 using MediatR;
@@ -52,7 +53,7 @@ public class CreateContactCommandHandler : IRequestHandler<CreateContactCommand,
                 })
                 .ToList()
         };
-        entity.Initials = $"{entity.FirstName[0]}{entity.LastName[0]}";
+        entity.Initials = ContactHelper.RetrieveInitialsOfNames(entity.FirstName, entity.LastName);
 
         entity.Created = DateTime.UtcNow;
 
