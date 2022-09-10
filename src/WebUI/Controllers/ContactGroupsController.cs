@@ -35,13 +35,12 @@ public class ContactGroupsController : ApiControllerBase
     {
         try
         {
-            var a = await Mediator.Send(query);
-
-            return a;
+            var result = await Mediator.Send(query);
+            return Ok(result);
         }
         catch (Exception ex)
         {
-            _logger.LogError("ERROR: contactgroups/list", ex);
+            _logger.LogError("ERROR => GET contactgroups/list", ex);
             throw;
         }
     }
@@ -55,7 +54,16 @@ public class ContactGroupsController : ApiControllerBase
     [HttpPost]
     public async Task<ActionResult<int>> Create(CreateContactGroupCommand command)
     {
-        return await Mediator.Send(command);
+        try
+        {
+            var result = await Mediator.Send(command);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("ERROR => POST contactgroups", ex);
+            throw;
+        }
     }
 
 
@@ -66,7 +74,16 @@ public class ContactGroupsController : ApiControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<ContactGroupDto>> Get(int id)
     {
-        return await Mediator.Send(new GetContactGroupQuery(id));
+        try
+        {
+            var result = await Mediator.Send(new GetContactGroupQuery(id));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"ERROR => GET contactgroups/{id}", ex);
+            throw;
+        }
     }
 
 
@@ -84,9 +101,16 @@ public class ContactGroupsController : ApiControllerBase
             return NotFound();
         }
 
-        await Mediator.Send(command);
-
-        return Ok();
+        try
+        {
+            await Mediator.Send(command);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"ERROR => PUT contactgroups/{id}", ex);
+            throw;
+        }
     }
 
 
@@ -98,9 +122,16 @@ public class ContactGroupsController : ApiControllerBase
     [HttpPatch("disable/{id}")]
     public async Task<ActionResult> Disable(int id)
     {
-        await Mediator.Send(new DisableContactGroupCommand(id));
-
-        return Ok();
+        try
+        {
+            await Mediator.Send(new DisableContactGroupCommand(id));
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"ERROR => PATCH contactgroups/disable/{id}", ex);
+            throw;
+        }
     }
 
 }

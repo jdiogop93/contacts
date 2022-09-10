@@ -35,14 +35,13 @@ public class ContactsController : ApiControllerBase
     {
         try
         {
-            var a = await Mediator.Send(query);
-
-            return a;
+            var result = await Mediator.Send(query);
+            return Ok(result);
         }
         catch (Exception ex)
         {
-            _logger.LogError("ERROR: contacts/list", ex);
-            throw;
+            _logger.LogError("ERROR => GET contacts/list", ex);
+            return BadRequest(ex.Message);
         }
     }
 
@@ -55,7 +54,16 @@ public class ContactsController : ApiControllerBase
     [HttpPost]
     public async Task<ActionResult<int>> Create(CreateContactCommand command)
     {
-        return await Mediator.Send(command);
+        try
+        {
+            var result = await Mediator.Send(command);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("ERROR => POST contacts", ex);
+            return BadRequest(ex.Message);
+        }
     }
 
 
@@ -68,11 +76,12 @@ public class ContactsController : ApiControllerBase
     {
         try
         {
-            return await Mediator.Send(new GetContactQuery(id));
+            var result = await Mediator.Send(new GetContactQuery(id));
+            return Ok(result);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("ISTO É UM TESTE");
+            _logger.LogError($"ERROR => GET contacts/{id}", ex);
             throw;
         }
     }
@@ -85,7 +94,16 @@ public class ContactsController : ApiControllerBase
     [HttpGet("detailed/{id}")]
     public async Task<ActionResult<ContactDetailedDto>> GetDetailed(int id)
     {
-        return await Mediator.Send(new GetDetailedContactQuery(id));
+        try
+        {
+            var result = await Mediator.Send(new GetDetailedContactQuery(id));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"ERROR => GET contacts/detailed/{id}", ex);
+            throw;
+        }
     }
 
 
@@ -103,9 +121,16 @@ public class ContactsController : ApiControllerBase
             return BadRequest();
         }
 
-        await Mediator.Send(command);
-
-        return NoContent();
+        try
+        {
+            await Mediator.Send(command);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"ERROR => PUT contacts/{id}", ex);
+            throw;
+        }
     }
 
 
@@ -117,9 +142,16 @@ public class ContactsController : ApiControllerBase
     [HttpPatch("disable/{id}")]
     public async Task<ActionResult> Disable(int id)
     {
-        await Mediator.Send(new DisableContactCommand(id));
-
-        return Ok();
+        try
+        {
+            await Mediator.Send(new DisableContactCommand(id));
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"ERROR => PATCH contacts/disable/{id}", ex);
+            throw;
+        }
     }
 
 }

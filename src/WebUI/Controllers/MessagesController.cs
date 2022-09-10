@@ -39,10 +39,11 @@ public class MessagesController : ApiControllerBase
         try
         {
             _mailService.Send(new List<string> { _configuration["Smtp:Username"] }, "test subject", "this is a test body email");
-            return Ok();
+            return NoContent();
         }
         catch (Exception ex)
         {
+            _logger.LogError($"ERROR => POST messages/send-test-email/{to}", ex);
             throw;
         }
     }
@@ -58,12 +59,12 @@ public class MessagesController : ApiControllerBase
     {
         try
         {
-            //format: 351960000000
             await _smsService.SendAsync(new string[] { to }, "this is a text body sms");
-            return Ok();
+            return NoContent();
         }
         catch (Exception ex)
         {
+            _logger.LogError($"ERROR => POST messages/send-test-sms/{to}", ex);
             throw;
         }
     }
@@ -82,13 +83,15 @@ public class MessagesController : ApiControllerBase
         {
             return NotFound();
         }
+
         try
         {
-            await Mediator.Send(command);
-            return Ok();
+            var result = await Mediator.Send(command);
+            return Ok(result);
         }
         catch (Exception ex)
         {
+            _logger.LogError($"ERROR => POST messages/send-email-group/{id}", ex);
             throw;
         }
     }
@@ -107,16 +110,17 @@ public class MessagesController : ApiControllerBase
         {
             return NotFound();
         }
+
         try
         {
-            await Mediator.Send(command);
-            return Ok();
+            var result = await Mediator.Send(command);
+            return Ok(result);
         }
         catch (Exception ex)
         {
+            _logger.LogError($"ERROR => POST messages/send-sms-group/{id}", ex);
             throw;
         }
     }
-
 
 }
