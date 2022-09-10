@@ -25,7 +25,7 @@ public class GetContactQueryHandler : IRequestHandler<GetContactQuery, ContactIt
     {
         var entity = await _context.Contacts
             .Where(l => l.Id == request.Id && l.Active)
-            .Include(x => x.Numbers.Where(n => n.Default).Take(1))
+            .Include(x => x.Numbers.Where(n => n.Default && n.Active).Take(1))
             .SingleOrDefaultAsync(cancellationToken);
 
         if (entity == null)

@@ -4,6 +4,7 @@ using Contacts.Application.Contacts.Commands.DisableContact;
 using Contacts.Application.Contacts.Commands.UpdateContact;
 using Contacts.Application.Contacts.Queries.GetContact;
 using Contacts.Application.Contacts.Queries.GetContactsList;
+using Contacts.Application.Contacts.Queries.GetDetailedContact;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -64,6 +65,17 @@ public class ContactsController : ApiControllerBase
     public async Task<ActionResult<ContactItemDto>> Get(int id)
     {
         return await Mediator.Send(new GetContactQuery(id));
+    }
+
+
+    /// <summary>
+    /// get detailed contact
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("detailed/{id}")]
+    public async Task<ActionResult<ContactDetailedDto>> GetDetailed(int id)
+    {
+        return await Mediator.Send(new GetDetailedContactQuery(id));
     }
 
 

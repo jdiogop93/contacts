@@ -145,6 +145,7 @@ export interface IContactsClient {
     create(command: CreateContactCommand): Observable<number>;
     get(id: number): Observable<ContactItemDto>;
     update(id: number, command: UpdateContactCommand): Observable<FileResponse>;
+    getDetailed(id: number): Observable<ContactDetailedDto>;
     disable(id: number): Observable<FileResponse>;
 }
 
@@ -372,6 +373,57 @@ export class ContactsClient implements IContactsClient {
             const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
             const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
             return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getDetailed(id: number): Observable<ContactDetailedDto> {
+        let url_ = this.baseUrl + "/api/Contacts/detailed/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDetailed(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDetailed(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ContactDetailedDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ContactDetailedDto>;
+        }));
+    }
+
+    protected processGetDetailed(response: HttpResponseBase): Observable<ContactDetailedDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ContactDetailedDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -1548,6 +1600,134 @@ export interface IContactItemDto {
     city?: string;
     country?: string;
     defaultPhoneNumber?: string;
+}
+
+export class ContactDetailedDto implements IContactDetailedDto {
+    id?: number;
+    firstName?: string;
+    lastName?: string;
+    initials?: string;
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+    email?: string;
+    numbers?: ContactNumberDetailedDto[];
+
+    constructor(data?: IContactDetailedDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.initials = _data["initials"];
+            this.street = _data["street"];
+            this.zipCode = _data["zipCode"];
+            this.city = _data["city"];
+            this.country = _data["country"];
+            this.email = _data["email"];
+            if (Array.isArray(_data["numbers"])) {
+                this.numbers = [] as any;
+                for (let item of _data["numbers"])
+                    this.numbers!.push(ContactNumberDetailedDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ContactDetailedDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactDetailedDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["initials"] = this.initials;
+        data["street"] = this.street;
+        data["zipCode"] = this.zipCode;
+        data["city"] = this.city;
+        data["country"] = this.country;
+        data["email"] = this.email;
+        if (Array.isArray(this.numbers)) {
+            data["numbers"] = [];
+            for (let item of this.numbers)
+                data["numbers"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IContactDetailedDto {
+    id?: number;
+    firstName?: string;
+    lastName?: string;
+    initials?: string;
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+    email?: string;
+    numbers?: ContactNumberDetailedDto[];
+}
+
+export class ContactNumberDetailedDto implements IContactNumberDetailedDto {
+    id?: number;
+    countryCode?: string;
+    phoneNumber?: string;
+    type?: ContactNumberTypeEnum;
+
+    constructor(data?: IContactNumberDetailedDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.countryCode = _data["countryCode"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.type = _data["type"];
+        }
+    }
+
+    static fromJS(data: any): ContactNumberDetailedDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactNumberDetailedDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["countryCode"] = this.countryCode;
+        data["phoneNumber"] = this.phoneNumber;
+        data["type"] = this.type;
+        return data;
+    }
+}
+
+export interface IContactNumberDetailedDto {
+    id?: number;
+    countryCode?: string;
+    phoneNumber?: string;
+    type?: ContactNumberTypeEnum;
 }
 
 export class UpdateContactCommand implements IUpdateContactCommand {
