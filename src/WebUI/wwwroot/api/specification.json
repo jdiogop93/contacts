@@ -454,12 +454,57 @@
         }
       }
     },
-    "/api/Messages": {
+    "/api/Messages/send-test-email/{to}": {
       "post": {
         "tags": [
           "Messages"
         ],
-        "operationId": "Messages_Send",
+        "operationId": "Messages_SendTestEmail",
+        "parameters": [
+          {
+            "name": "to",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Messages/send-test-sms/{to}": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "Messages_SendTestSms",
+        "parameters": [
+          {
+            "name": "to",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -499,6 +544,51 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/SendEmailContactGroupCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Messages/send-sms-group/{id}": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "Messages_SendSmsGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendSmsContactGroupCommand"
               }
             }
           },
@@ -1316,6 +1406,19 @@
             "type": "string"
           },
           "content": {
+            "type": "string"
+          }
+        }
+      },
+      "SendSmsContactGroupCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
             "type": "string"
           }
         }

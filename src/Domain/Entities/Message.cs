@@ -9,4 +9,6 @@ public class Message : BaseAuditableEntity
     public string? EmailsTo { get; set; }
     public string? EmailsCc { get; set; }
     public string? EmailsBcc { get; set; }
+    public MessageResultStatus ResultStatus { get; set; }
+    public string Result { get; set; }
 }

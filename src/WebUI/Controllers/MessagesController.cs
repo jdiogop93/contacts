@@ -1,5 +1,5 @@
 ﻿using Contacts.Application.Common.Interfaces;
-using Contacts.Application.Messages.Commands.SendEmailContactGroup;
+using Contacts.Application.Messages.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,29 +10,56 @@ public class MessagesController : ApiControllerBase
 {
     private readonly ILogger<MessagesController> _logger;
     private readonly IMailService _mailService;
+    private readonly ISmsService _smsService;
+    private readonly IConfiguration _configuration;
 
     public MessagesController
     (
         ILogger<MessagesController> logger,
-        IMailService mailService
+        IMailService mailService,
+        ISmsService smsService,
+        IConfiguration configuration
     )
     {
         _logger = logger;
         _mailService = mailService;
+        _smsService = smsService;
+        _configuration = configuration;
     }
 
 
     /// <summary>
-    /// send email
+    /// send test email
     /// </summary>
-    /// <param name="command"></param>
+    /// <param name="to"></param>
     /// <returns></returns>
-    [HttpPost]
-    public ActionResult Send()
+    [HttpPost("send-test-email/{to}")]
+    public ActionResult SendTestEmail(string to)
     {
         try
         {
-            _mailService.Send(new List<string> { "ze.diogo.pereira@hotmail.com" }, "teste", "isto é o corpo da mensagem");
+            _mailService.Send(new List<string> { _configuration["Smtp:Username"] }, "test subject", "this is a test body email");
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+
+    /// <summary>
+    /// send test sms
+    /// </summary>
+    /// <param name="to"></param>
+    /// <returns></returns>
+    [HttpPost("send-test-sms/{to}")]
+    public async Task<ActionResult> SendTestSms(string to)
+    {
+        try
+        {
+            //format: 351960000000
+            await _smsService.SendAsync(new string[] { to }, "this is a text body sms");
             return Ok();
         }
         catch (Exception ex)
@@ -55,10 +82,40 @@ public class MessagesController : ApiControllerBase
         {
             return NotFound();
         }
+        try
+        {
+            await Mediator.Send(command);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
 
-        await Mediator.Send(command);
 
-        return Ok();
+    /// <summary>
+    /// send sms to all contacts of group
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    [HttpPost("send-sms-group/{id}")]
+    public async Task<ActionResult> SendSmsGroup(int id, SendSmsContactGroupCommand command)
+    {
+        if (id != command.Id)
+        {
+            return NotFound();
+        }
+        try
+        {
+            await Mediator.Send(command);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 
 

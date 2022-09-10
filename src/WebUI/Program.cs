@@ -32,7 +32,7 @@ if (app.Environment.IsDevelopment())
         var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
         await initialiser.InitialiseAsync();
         await initialiser.SeedAsync();
-        initialiser.Seed();
+        await initialiser.Seed();
     }
 }
 else

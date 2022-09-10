@@ -66,6 +66,16 @@ public class ApplicationDbContextInitialiser
         }
     }
 
+    public async Task TrySeed()
+    {
+        SeedContactsAndNumbers();
+        SeedTestContactsWithNumbers();
+        SeedContactGroups();
+        SeedContactGroupContacts();
+
+        _context.SaveChanges();
+    }
+
     private void SeedContactsAndNumbers()
     {
         if (!_context.Contacts.Any(x => x.Active))
@@ -85,13 +95,13 @@ public class ApplicationDbContextInitialiser
                         new ContactNumber
                         {
                             CountryCode = "+351",
-                            PhoneNumber = "258000000",
+                            PhoneNumber = "961052627",
                             Type = Domain.Enums.ContactNumberType.HOME
                         },
                         new ContactNumber
                         {
-                            CountryCode = "+48",
-                            PhoneNumber = "0011223344",
+                            CountryCode = "+351",
+                            PhoneNumber = "910457506",
                             Type = Domain.Enums.ContactNumberType.MOBILE,
                             Default = true
                         }
@@ -179,15 +189,6 @@ public class ApplicationDbContextInitialiser
         }
     }
 
-    public async Task TrySeed()
-    {
-        SeedContactsAndNumbers();
-        SeedTestContactsWithNumbers();
-        SeedContactGroups();
-        SeedContactGroupContacts();
-
-        _context.SaveChanges();
-    }
 
     public async Task TrySeedAsync()
     {
@@ -227,5 +228,6 @@ public class ApplicationDbContextInitialiser
             await _context.SaveChangesAsync();
         }
     }
+
 
 }

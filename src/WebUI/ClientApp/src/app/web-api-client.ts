@@ -648,8 +648,10 @@ export class ContactsClient implements IContactsClient {
 }
 
 export interface IMessagesClient {
-    send(): Observable<FileResponse>;
+    sendTestEmail(to: string | null): Observable<FileResponse>;
+    sendTestSms(to: string | null): Observable<FileResponse>;
     sendEmailGroup(id: number, command: SendEmailContactGroupCommand): Observable<FileResponse>;
+    sendSmsGroup(id: number, command: SendSmsContactGroupCommand): Observable<FileResponse>;
 }
 
 @Injectable({
@@ -665,8 +667,11 @@ export class MessagesClient implements IMessagesClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    send(): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Messages";
+    sendTestEmail(to: string | null): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/Messages/send-test-email/{to}";
+        if (to === undefined || to === null)
+            throw new Error("The parameter 'to' must be defined.");
+        url_ = url_.replace("{to}", encodeURIComponent("" + to));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -678,11 +683,11 @@ export class MessagesClient implements IMessagesClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSend(response_);
+            return this.processSendTestEmail(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSend(response_ as any);
+                    return this.processSendTestEmail(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<FileResponse>;
                 }
@@ -691,7 +696,56 @@ export class MessagesClient implements IMessagesClient {
         }));
     }
 
-    protected processSend(response: HttpResponseBase): Observable<FileResponse> {
+    protected processSendTestEmail(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    sendTestSms(to: string | null): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/Messages/send-test-sms/{to}";
+        if (to === undefined || to === null)
+            throw new Error("The parameter 'to' must be defined.");
+        url_ = url_.replace("{to}", encodeURIComponent("" + to));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSendTestSms(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSendTestSms(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileResponse>;
+        }));
+    }
+
+    protected processSendTestSms(response: HttpResponseBase): Observable<FileResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -745,6 +799,59 @@ export class MessagesClient implements IMessagesClient {
     }
 
     protected processSendEmailGroup(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    sendSmsGroup(id: number, command: SendSmsContactGroupCommand): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/Messages/send-sms-group/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSendSmsGroup(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSendSmsGroup(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileResponse>;
+        }));
+    }
+
+    protected processSendSmsGroup(response: HttpResponseBase): Observable<FileResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2306,6 +2413,46 @@ export interface ISendEmailContactGroupCommand {
     id?: number;
     subject?: string;
     content?: string;
+}
+
+export class SendSmsContactGroupCommand implements ISendSmsContactGroupCommand {
+    id?: number;
+    message?: string;
+
+    constructor(data?: ISendSmsContactGroupCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.message = _data["message"];
+        }
+    }
+
+    static fromJS(data: any): SendSmsContactGroupCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new SendSmsContactGroupCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["message"] = this.message;
+        return data;
+    }
+}
+
+export interface ISendSmsContactGroupCommand {
+    id?: number;
+    message?: string;
 }
 
 export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {

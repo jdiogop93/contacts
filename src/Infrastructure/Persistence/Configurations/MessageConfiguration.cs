@@ -1,6 +1,5 @@
 ﻿using Contacts.Domain.Entities;
 using Contacts.Domain.Enums;
-using Contacts.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -35,6 +34,14 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 
         builder.Property(t => t.EmailsBcc)
             .IsRequired(false);
+
+        builder.Property(x => x.ResultStatus)
+            .HasMaxLength(10)
+            .HasConversion(
+                v => v.ToString(),
+                v => (MessageResultStatus)Enum.Parse(typeof(MessageResultStatus), v));
+
+        builder.Property(x => x.Result);
 
         builder.Property(x => x.Created);
 

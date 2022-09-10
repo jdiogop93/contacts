@@ -2,10 +2,12 @@
 using Contacts.Application.Common.Exceptions;
 using Contacts.Application.Common.Interfaces;
 using Contacts.Domain.Entities;
+using Contacts.Domain.Enums;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Contacts.Application.Messages.Commands.SendEmailContactGroup;
+namespace Contacts.Application.Messages.Commands;
 
 //[Authorize]
 public record SendEmailContactGroupCommand : IRequest<int>
@@ -48,29 +50,50 @@ public class SendEmailContactGroupCommandHandler : IRequestHandler<SendEmailCont
         }
 
         var emails = entity.Contacts
+            .Where(c => c.Contact.Active)
             .Select(c => c.Contact.Email)
             .ToList();
 
-        _mailService.Send(
-            emails,
-            request.Subject,
-            request.Content
-        );
+        if (emails.Count == 0)
+        {
+            throw new ValidationException(
+                new List<ValidationFailure>
+                {
+                    new ValidationFailure(nameof(ContactNumber), $"The contact group ({entity.Id}) doesnt have valid contact emails to send an email.")
+                }
+            );
+        }
 
-        //if it reached here, it means the sending was successful
+        var status = MessageResultStatus.OK;
+        var result = status.ToString();
+        try
+        {
+            _mailService.Send(
+                emails,
+                request.Subject,
+                request.Content
+            );
+        }
+        catch (Exception ex)
+        {
+            status = MessageResultStatus.ERROR;
+            result = ex.ToString();
+        }
 
         var message = new Message
         {
-            Type = Domain.Enums.MessageType.EMAIL,
+            Type = MessageType.EMAIL,
             Subject = request.Subject,
             Content = request.Content,
-            EmailsTo = string.Join(";", emails)
+            EmailsTo = string.Join(";", emails),
+            ResultStatus = status,
+            Result = result
         };
 
         _context.Messages.Add(message);
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return entity.Id;
+        return message.Id;
     }
 }
