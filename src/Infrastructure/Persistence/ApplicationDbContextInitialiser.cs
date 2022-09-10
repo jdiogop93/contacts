@@ -53,46 +53,22 @@ public class ApplicationDbContextInitialiser
         }
     }
 
-    public async Task TrySeedAsync()
+    public async Task Seed()
     {
-        // Default roles
-        var administratorRole = new IdentityRole("Administrator");
-
-        if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
+        try
         {
-            await _roleManager.CreateAsync(administratorRole);
+            await TrySeed();
         }
-
-        // Default users
-        var administrator = new ApplicationUser { UserName = "administrator@localhost", Email = "administrator@localhost" };
-
-        if (_userManager.Users.All(u => u.UserName != administrator.UserName))
+        catch (Exception ex)
         {
-            await _userManager.CreateAsync(administrator, "Administrator1!");
-            await _userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
+            _logger.LogError(ex, "An error occurred while seeding the database.");
+            throw;
         }
+    }
 
-        // Default data
-        // Seed, if necessary
-        if (!_context.TodoLists.Any())
-        {
-            _context.TodoLists.Add(new TodoList
-            {
-                Title = "Todo List",
-                Items =
-                {
-                    new TodoItem { Title = "Make a todo list 📃" },
-                    new TodoItem { Title = "Check off the first item ✅" },
-                    new TodoItem { Title = "Realise you've already done two things on the list! 🤯"},
-                    new TodoItem { Title = "Reward yourself with a nice, long nap 🏆" },
-                }
-            });
-
-            await _context.SaveChangesAsync();
-        }
-
-        #region Contacts
-        if (!_context.Contacts.Any())
+    private void SeedContactsAndNumbers()
+    {
+        if (!_context.Contacts.Any(x => x.Active))
         {
             var contactsToAdd = new List<Contact>
             {
@@ -131,6 +107,15 @@ public class ApplicationDbContextInitialiser
                     Email = "jde93pereira@gmail.com"
                 }
             };
+            _context.Contacts.AddRange(contactsToAdd);
+        }
+    }
+
+    private void SeedTestContactsWithNumbers()
+    {
+        if (_context.Contacts.Where(x => x.Active).Count() == 2)
+        {
+            var contactsToAdd = new List<Contact>();
 
             int numberOfContactsToCreate = 123;
             for (int i = 0; i < numberOfContactsToCreate; i++)
@@ -158,34 +143,89 @@ public class ApplicationDbContextInitialiser
             }
 
             _context.Contacts.AddRange(contactsToAdd);
+        }
+    }
+
+    private void SeedContactGroups()
+    {
+        if (!_context.ContactGroups.Any(x => x.Active))
+        {
+            var groups = new List<ContactGroup>
+            {
+                new ContactGroup { Name = "Group A" },
+                new ContactGroup { Name = "Group B" },
+                new ContactGroup { Name = "Group C" }
+            };
+            _context.ContactGroups.AddRange(groups);
+        }
+    }
+
+    private void SeedContactGroupContacts()
+    {
+        if (!_context.ContactGroupContacts.Any(x => x.Active))
+        {
+            var firstGroup = _context.ContactGroups
+                .FirstOrDefault(x => x.Name == "Group A");
+
+            var contacts = _context.Contacts
+                .Where(x => x.Initials.Contains("JP") || x.Initials.Contains("CP"))
+                .ToList();
+
+            var groupContacts = contacts
+                .Select(x => new ContactGroupContact { ContactId = x.Id, ContactGroupId = firstGroup.Id })
+                .ToList();
+
+            _context.ContactGroupContacts.AddRange(groupContacts);
+        }
+    }
+
+    public async Task TrySeed()
+    {
+        SeedContactsAndNumbers();
+        SeedTestContactsWithNumbers();
+        SeedContactGroups();
+        SeedContactGroupContacts();
+
+        _context.SaveChanges();
+    }
+
+    public async Task TrySeedAsync()
+    {
+        // Default roles
+        var administratorRole = new IdentityRole("Administrator");
+
+        if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
+        {
+            await _roleManager.CreateAsync(administratorRole);
+        }
+
+        // Default users
+        var administrator = new ApplicationUser { UserName = "administrator@localhost", Email = "administrator@localhost" };
+
+        if (_userManager.Users.All(u => u.UserName != administrator.UserName))
+        {
+            await _userManager.CreateAsync(administrator, "Administrator1!");
+            await _userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
+        }
+
+        // Default data
+        // Seed, if necessary
+        if (!_context.TodoLists.Any())
+        {
+            _context.TodoLists.Add(new TodoList
+            {
+                Title = "Todo List",
+                Items =
+                {
+                    new TodoItem { Title = "Make a todo list 📃" },
+                    new TodoItem { Title = "Check off the first item ✅" },
+                    new TodoItem { Title = "Realise you've already done two things on the list! 🤯"},
+                    new TodoItem { Title = "Reward yourself with a nice, long nap 🏆" },
+                }
+            });
 
             await _context.SaveChangesAsync();
         }
-        #endregion
-
     }
-
-
-    //private Contact GenerateContactByIndex()
-    //{
-    //    return new Contact
-    //    {
-    //        FirstName = $"Nome",
-    //        LastName = $"Apelido",
-    //        Initials = $"N",
-    //        Address = new Domain.ValueObjects.Address("Foz", "4900", "Porto", "Portugal"),
-    //        Email = $"na@teste.com",
-    //        Numbers = new List<ContactNumber>
-    //        {
-    //            new ContactNumber
-    //            {
-    //                CountryCode = "+351",
-    //                PhoneNumber = $"961111111",
-    //                Type = Domain.Enums.ContactNumberType.MOBILE
-    //            }
-    //        }
-    //    };
-    //}
-
 
 }

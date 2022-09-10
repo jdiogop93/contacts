@@ -2,5 +2,5 @@
 
 public interface IMailService
 {
-    void Send(string to, string subject, string html, string from = null);
+    void Send(IList<string> to, string subject, string html/*, string from = null*/);
 }

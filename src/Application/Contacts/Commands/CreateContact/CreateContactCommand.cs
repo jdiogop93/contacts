@@ -37,6 +37,8 @@ public class CreateContactCommandHandler : IRequestHandler<CreateContactCommand,
 
     public async Task<int> Handle(CreateContactCommand request, CancellationToken cancellationToken)
     {
+        var currentTime = DateTime.UtcNow;
+
         var entity = new Contact
         {
             FirstName = request.FirstName,
@@ -49,13 +51,13 @@ public class CreateContactCommandHandler : IRequestHandler<CreateContactCommand,
                     CountryCode = n.CountryCode,
                     PhoneNumber = n.PhoneNumber,
                     Type = (ContactNumberType)n.Type,
-                    Default = n.Default
+                    Default = n.Default,
+                    Created = currentTime,
                 })
-                .ToList()
+                .ToList(),
+            Created = currentTime
         };
         entity.Initials = ContactHelper.RetrieveInitialsOfNames(entity.FirstName, entity.LastName);
-
-        entity.Created = DateTime.UtcNow;
 
         _context.Contacts.Add(entity);
 

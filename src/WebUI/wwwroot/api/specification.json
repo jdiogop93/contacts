@@ -475,6 +475,51 @@
         }
       }
     },
+    "/api/Messages/send-email-group/{id}": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "Messages_SendEmailGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEmailContactGroupCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -1256,6 +1301,22 @@
             "items": {
               "$ref": "#/components/schemas/ContactNumberDto"
             }
+          }
+        }
+      },
+      "SendEmailContactGroupCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
           }
         }
       },

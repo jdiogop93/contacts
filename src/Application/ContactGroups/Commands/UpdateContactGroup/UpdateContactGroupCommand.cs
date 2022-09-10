@@ -79,7 +79,8 @@ public class UpdateContactGroupCommandHandler : IRequestHandler<UpdateContactGro
                 contactsToSave.Add(new ContactGroupContact
                 {
                     ContactId = c,
-                    ContactGroupId = entity.Id
+                    ContactGroupId = entity.Id,
+                    Created = currentTime
                 });
             }
         }

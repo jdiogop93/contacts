@@ -58,6 +58,7 @@ public class UpdateContactCommandHandler : IRequestHandler<UpdateContactCommand>
         entity.Initials = ContactHelper.RetrieveInitialsOfNames(entity.FirstName, entity.LastName);
         entity.Address = new Address(request.Street, request.ZipCode, request.City, request.Country);
         entity.Email = request.Email;
+        entity.LastModified = currentTime;
 
         var numbers = new HashSet<ContactNumber>();
         #region ContactNumbers
@@ -104,6 +105,7 @@ public class UpdateContactCommandHandler : IRequestHandler<UpdateContactCommand>
                     line.PhoneNumber = n.PhoneNumber;
                     line.Type = (ContactNumberType)n.Type;
                     line.Default = n.Default;
+                    line.LastModified = currentTime;
                     numbers.Add(line);
                 }
             }
@@ -140,7 +142,8 @@ public class UpdateContactCommandHandler : IRequestHandler<UpdateContactCommand>
                     CountryCode = n.CountryCode,
                     PhoneNumber = n.PhoneNumber,
                     Type = (ContactNumberType)n.Type,
-                    Default = n.Default
+                    Default = n.Default,
+                    Created = currentTime
                 });
             }
             #endregion

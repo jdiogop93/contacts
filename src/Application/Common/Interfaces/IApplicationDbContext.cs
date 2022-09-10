@@ -17,5 +17,7 @@ public interface IApplicationDbContext
 
     DbSet<ContactGroupContact> ContactGroupContacts { get; }
 
+    DbSet<Message> Messages { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

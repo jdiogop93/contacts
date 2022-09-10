@@ -36,6 +36,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     public DbSet<ContactNumber> ContactNumbers => Set<ContactNumber>();
     public DbSet<ContactGroup> ContactGroups => Set<ContactGroup>();
     public DbSet<ContactGroupContact> ContactGroupContacts => Set<ContactGroupContact>();
+    public DbSet<Message> Messages => Set<Message>();
     #endregion
 
 

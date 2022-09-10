@@ -1,4 +1,5 @@
 ﻿using Contacts.Application.Common.Interfaces;
+using Contacts.Application.Messages.Commands.SendEmailContactGroup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,13 +32,33 @@ public class MessagesController : ApiControllerBase
     {
         try
         {
-            _mailService.Send("jdiogopereira93@gmail.com", "teste", "isto é o corpo da mensagem");
+            _mailService.Send(new List<string> { "ze.diogo.pereira@hotmail.com" }, "teste", "isto é o corpo da mensagem");
             return Ok();
         }
         catch (Exception ex)
         {
             throw;
         }
+    }
+
+
+    /// <summary>
+    /// send email to all contacts of group
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    [HttpPost("send-email-group/{id}")]
+    public async Task<ActionResult> SendEmailGroup(int id, SendEmailContactGroupCommand command)
+    {
+        if (id != command.Id)
+        {
+            return NotFound();
+        }
+
+        await Mediator.Send(command);
+
+        return Ok();
     }
 
 

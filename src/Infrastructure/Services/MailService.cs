@@ -4,33 +4,29 @@ using Microsoft.Extensions.Options;
 using MimeKit.Text;
 using MimeKit;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
 
 namespace Contacts.Infrastructure.Services;
 
 public class MailService : IMailService
 {
-    //private readonly AppSettings _appSettings;
+    private readonly IConfiguration _configuration;
 
     public MailService
     (
-    //IOptions<AppSettings> appSettings
+        IConfiguration configuration
     )
     {
-        //_appSettings = appSettings.Value;
+        _configuration = configuration;
     }
 
-    public void Send(string to, string subject, string html, string from = null)
+    public void Send(IList<string> to, string subject, string html/*, string from = null*/)
     {
-        from = "contacts.challenge.set2022@sapo.pt";
-        var pass = "!!chaLLenge123#";
-
         // create message
         var email = new MimeMessage();
 
-        //email.From.Add(MailboxAddress.Parse(from ?? _appSettings.EmailFrom));
-        email.From.Add(MailboxAddress.Parse(from));
-
-        email.To.Add(MailboxAddress.Parse(to));
+        email.From.Add(MailboxAddress.Parse(/*from ??*/_configuration["Smtp:Username"]));
+        email.To.AddRange(to.Select(x => MailboxAddress.Parse(x)));
         email.Subject = subject;
         email.Body = new TextPart(TextFormat.Html) { Text = html };
 
@@ -38,10 +34,10 @@ public class MailService : IMailService
         using var smtp = new SmtpClient();
 
         //smtp.Connect(_appSettings.SmtpHost, _appSettings.SmtpPort, SecureSocketOptions.StartTls);
-        smtp.Connect("smtp.sapo.pt", 587, SecureSocketOptions.Auto);
+        smtp.Connect(_configuration["Smtp:Host"], int.Parse(_configuration["Smtp:Port"]), SecureSocketOptions.Auto);
 
         //smtp.Authenticate(_appSettings.SmtpUser, _appSettings.SmtpPass);
-        smtp.Authenticate(from, pass);
+        smtp.Authenticate(_configuration["Smtp:Username"], _configuration["Smtp:Password"]);
 
         smtp.Send(email);
         smtp.Disconnect(true);
