@@ -1,4 +1,4 @@
-﻿namespace Contacts.Application.Contacts.Queries.GetContactsList;
+﻿namespace Contacts.Application.Contacts.Common;
 
 public class ContactListItemDto
 {

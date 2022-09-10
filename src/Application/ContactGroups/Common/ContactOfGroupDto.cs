@@ -1,4 +1,4 @@
-﻿namespace Contacts.Application.ContactGroups.Commands.UpdateContactGroup;
+﻿namespace Contacts.Application.ContactGroups.Common;
 
 public class ContactOfGroupDto
 {

@@ -17,6 +17,7 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IContactGroupsClient {
     create(command: CreateContactGroupCommand): Observable<number>;
+    get(id: number): Observable<ContactGroupDto>;
     update(id: number, command: UpdateContactGroupCommand): Observable<FileResponse>;
 }
 
@@ -76,6 +77,57 @@ export class ContactGroupsClient implements IContactGroupsClient {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    get(id: number): Observable<ContactGroupDto> {
+        let url_ = this.baseUrl + "/api/ContactGroups/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ContactGroupDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ContactGroupDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<ContactGroupDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ContactGroupDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1232,6 +1284,274 @@ export interface ICreateContactGroupCommand {
     contactsIds?: number[];
 }
 
+export class ContactGroupDto implements IContactGroupDto {
+    id?: number;
+    name?: string;
+    contacts?: ContactDetailedDto[];
+
+    constructor(data?: IContactGroupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["contacts"])) {
+                this.contacts = [] as any;
+                for (let item of _data["contacts"])
+                    this.contacts!.push(ContactDetailedDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ContactGroupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactGroupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.contacts)) {
+            data["contacts"] = [];
+            for (let item of this.contacts)
+                data["contacts"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IContactGroupDto {
+    id?: number;
+    name?: string;
+    contacts?: ContactDetailedDto[];
+}
+
+export class ContactDto implements IContactDto {
+    firstName?: string;
+    lastName?: string;
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+    email?: string;
+    numbers?: ContactNumberDto[];
+
+    constructor(data?: IContactDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.street = _data["street"];
+            this.zipCode = _data["zipCode"];
+            this.city = _data["city"];
+            this.country = _data["country"];
+            this.email = _data["email"];
+            if (Array.isArray(_data["numbers"])) {
+                this.numbers = [] as any;
+                for (let item of _data["numbers"])
+                    this.numbers!.push(ContactNumberDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ContactDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["street"] = this.street;
+        data["zipCode"] = this.zipCode;
+        data["city"] = this.city;
+        data["country"] = this.country;
+        data["email"] = this.email;
+        if (Array.isArray(this.numbers)) {
+            data["numbers"] = [];
+            for (let item of this.numbers)
+                data["numbers"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IContactDto {
+    firstName?: string;
+    lastName?: string;
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+    email?: string;
+    numbers?: ContactNumberDto[];
+}
+
+export class ContactDetailedDto extends ContactDto implements IContactDetailedDto {
+    id?: number;
+    initials?: string;
+    numbers?: ContactNumberDetailedDto[];
+
+    constructor(data?: IContactDetailedDto) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.id = _data["id"];
+            this.initials = _data["initials"];
+            if (Array.isArray(_data["numbers"])) {
+                this.numbers = [] as any;
+                for (let item of _data["numbers"])
+                    this.numbers!.push(ContactNumberDetailedDto.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): ContactDetailedDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactDetailedDto();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["initials"] = this.initials;
+        if (Array.isArray(this.numbers)) {
+            data["numbers"] = [];
+            for (let item of this.numbers)
+                data["numbers"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IContactDetailedDto extends IContactDto {
+    id?: number;
+    initials?: string;
+    numbers?: ContactNumberDetailedDto[];
+}
+
+export class ContactNumberDetailedDto implements IContactNumberDetailedDto {
+    id?: number;
+    countryCode?: string;
+    phoneNumber?: string;
+    type?: ContactNumberTypeEnum;
+    default?: boolean;
+
+    constructor(data?: IContactNumberDetailedDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.countryCode = _data["countryCode"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.type = _data["type"];
+            this.default = _data["default"];
+        }
+    }
+
+    static fromJS(data: any): ContactNumberDetailedDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactNumberDetailedDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["countryCode"] = this.countryCode;
+        data["phoneNumber"] = this.phoneNumber;
+        data["type"] = this.type;
+        data["default"] = this.default;
+        return data;
+    }
+}
+
+export interface IContactNumberDetailedDto {
+    id?: number;
+    countryCode?: string;
+    phoneNumber?: string;
+    type?: ContactNumberTypeEnum;
+    default?: boolean;
+}
+
+export enum ContactNumberTypeEnum {
+    HOME = 0,
+    MOBILE = 1,
+    WORK = 2,
+}
+
+export class ContactNumberDto extends ContactNumberDetailedDto implements IContactNumberDto {
+    id?: number | undefined;
+    toDelete?: boolean;
+
+    constructor(data?: IContactNumberDto) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.id = _data["id"];
+            this.toDelete = _data["toDelete"];
+        }
+    }
+
+    static override fromJS(data: any): ContactNumberDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactNumberDto();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["toDelete"] = this.toDelete;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IContactNumberDto extends IContactNumberDetailedDto {
+    id?: number | undefined;
+    toDelete?: boolean;
+}
+
 export class UpdateContactGroupCommand implements IUpdateContactGroupCommand {
     id?: number;
     name?: string;
@@ -1476,68 +1796,6 @@ export interface ICreateContactCommand {
     numbers?: ContactNumberDto[];
 }
 
-export class ContactNumberDto implements IContactNumberDto {
-    id?: number | undefined;
-    countryCode?: string;
-    phoneNumber?: string;
-    type?: ContactNumberTypeEnum;
-    default?: boolean;
-    toDelete?: boolean;
-
-    constructor(data?: IContactNumberDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.countryCode = _data["countryCode"];
-            this.phoneNumber = _data["phoneNumber"];
-            this.type = _data["type"];
-            this.default = _data["default"];
-            this.toDelete = _data["toDelete"];
-        }
-    }
-
-    static fromJS(data: any): ContactNumberDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ContactNumberDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["countryCode"] = this.countryCode;
-        data["phoneNumber"] = this.phoneNumber;
-        data["type"] = this.type;
-        data["default"] = this.default;
-        data["toDelete"] = this.toDelete;
-        return data;
-    }
-}
-
-export interface IContactNumberDto {
-    id?: number | undefined;
-    countryCode?: string;
-    phoneNumber?: string;
-    type?: ContactNumberTypeEnum;
-    default?: boolean;
-    toDelete?: boolean;
-}
-
-export enum ContactNumberTypeEnum {
-    HOME = 0,
-    MOBILE = 1,
-    WORK = 2,
-}
-
 export class ContactItemDto implements IContactItemDto {
     id?: number;
     name?: string;
@@ -1600,134 +1858,6 @@ export interface IContactItemDto {
     city?: string;
     country?: string;
     defaultPhoneNumber?: string;
-}
-
-export class ContactDetailedDto implements IContactDetailedDto {
-    id?: number;
-    firstName?: string;
-    lastName?: string;
-    initials?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
-    email?: string;
-    numbers?: ContactNumberDetailedDto[];
-
-    constructor(data?: IContactDetailedDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.firstName = _data["firstName"];
-            this.lastName = _data["lastName"];
-            this.initials = _data["initials"];
-            this.street = _data["street"];
-            this.zipCode = _data["zipCode"];
-            this.city = _data["city"];
-            this.country = _data["country"];
-            this.email = _data["email"];
-            if (Array.isArray(_data["numbers"])) {
-                this.numbers = [] as any;
-                for (let item of _data["numbers"])
-                    this.numbers!.push(ContactNumberDetailedDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): ContactDetailedDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ContactDetailedDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["firstName"] = this.firstName;
-        data["lastName"] = this.lastName;
-        data["initials"] = this.initials;
-        data["street"] = this.street;
-        data["zipCode"] = this.zipCode;
-        data["city"] = this.city;
-        data["country"] = this.country;
-        data["email"] = this.email;
-        if (Array.isArray(this.numbers)) {
-            data["numbers"] = [];
-            for (let item of this.numbers)
-                data["numbers"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IContactDetailedDto {
-    id?: number;
-    firstName?: string;
-    lastName?: string;
-    initials?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
-    email?: string;
-    numbers?: ContactNumberDetailedDto[];
-}
-
-export class ContactNumberDetailedDto implements IContactNumberDetailedDto {
-    id?: number;
-    countryCode?: string;
-    phoneNumber?: string;
-    type?: ContactNumberTypeEnum;
-
-    constructor(data?: IContactNumberDetailedDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.countryCode = _data["countryCode"];
-            this.phoneNumber = _data["phoneNumber"];
-            this.type = _data["type"];
-        }
-    }
-
-    static fromJS(data: any): ContactNumberDetailedDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ContactNumberDetailedDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["countryCode"] = this.countryCode;
-        data["phoneNumber"] = this.phoneNumber;
-        data["type"] = this.type;
-        return data;
-    }
-}
-
-export interface IContactNumberDetailedDto {
-    id?: number;
-    countryCode?: string;
-    phoneNumber?: string;
-    type?: ContactNumberTypeEnum;
 }
 
 export class UpdateContactCommand implements IUpdateContactCommand {

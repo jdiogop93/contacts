@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Contacts.Application.Common.Interfaces;
 using Contacts.Application.Common.Mappings;
 using Contacts.Application.Common.Models;
+using Contacts.Application.Contacts.Common;
 using Contacts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

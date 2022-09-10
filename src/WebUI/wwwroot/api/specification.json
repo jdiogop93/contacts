@@ -40,6 +40,36 @@
       }
     },
     "/api/ContactGroups/{id}": {
+      "get": {
+        "tags": [
+          "ContactGroups"
+        ],
+        "operationId": "ContactGroups_Get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactGroupDto"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "ContactGroups"
@@ -745,6 +775,141 @@
           }
         }
       },
+      "ContactGroupDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactDetailedDto"
+            }
+          }
+        }
+      },
+      "ContactDetailedDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContactDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "initials": {
+                "type": "string"
+              },
+              "numbers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ContactNumberDetailedDto"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ContactNumberDetailedDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ContactNumberTypeEnum"
+          },
+          "default": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ContactNumberTypeEnum": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "HOME",
+          "MOBILE",
+          "WORK"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "ContactDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "numbers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactNumberDto"
+            }
+          }
+        }
+      },
+      "ContactNumberDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContactNumberDetailedDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int32",
+                "nullable": true
+              },
+              "toDelete": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      },
       "UpdateContactGroupCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -851,46 +1016,6 @@
           }
         }
       },
-      "ContactNumberDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "countryCode": {
-            "type": "string"
-          },
-          "phoneNumber": {
-            "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ContactNumberTypeEnum"
-          },
-          "default": {
-            "type": "boolean"
-          },
-          "toDelete": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ContactNumberTypeEnum": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "HOME",
-          "MOBILE",
-          "WORK"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
-      },
       "ContactItemDto": {
         "type": "object",
         "additionalProperties": false,
@@ -919,65 +1044,6 @@
           },
           "defaultPhoneNumber": {
             "type": "string"
-          }
-        }
-      },
-      "ContactDetailedDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "initials": {
-            "type": "string"
-          },
-          "street": {
-            "type": "string"
-          },
-          "zipCode": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "numbers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ContactNumberDetailedDto"
-            }
-          }
-        }
-      },
-      "ContactNumberDetailedDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "countryCode": {
-            "type": "string"
-          },
-          "phoneNumber": {
-            "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ContactNumberTypeEnum"
           }
         }
       },

@@ -1,5 +1,8 @@
 ﻿using Contacts.Application.ContactGroups.Commands.CreateContactGroup;
 using Contacts.Application.ContactGroups.Commands.UpdateContactGroup;
+using Contacts.Application.ContactGroups.Common;
+using Contacts.Application.Contacts.Queries.GetContact;
+using Contacts.Application.Contacts.Queries.GetContactGroup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +31,17 @@ public class ContactGroupsController : ApiControllerBase
     public async Task<ActionResult<int>> Create(CreateContactGroupCommand command)
     {
         return await Mediator.Send(command);
+    }
+
+
+    /// <summary>
+    /// get contact group
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ContactGroupDto>> Get(int id)
+    {
+        return await Mediator.Send(new GetContactGroupQuery(id));
     }
 
 

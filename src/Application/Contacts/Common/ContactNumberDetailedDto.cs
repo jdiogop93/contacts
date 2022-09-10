@@ -1,10 +1,9 @@
 ﻿using Contacts.Application.Contacts.Commands.Common;
 
-namespace Contacts.Application.Contacts.Queries.GetDetailedContact;
+namespace Contacts.Application.Contacts.Common;
 
 public class ContactNumberDetailedDto
 {
-    //Photo //TODO
     public int Id { get; set; }
     public string CountryCode { get; set; }
     public string PhoneNumber { get; set; }

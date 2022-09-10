@@ -2,6 +2,7 @@
 using Contacts.Application.Contacts.Commands.CreateContact;
 using Contacts.Application.Contacts.Commands.DisableContact;
 using Contacts.Application.Contacts.Commands.UpdateContact;
+using Contacts.Application.Contacts.Common;
 using Contacts.Application.Contacts.Queries.GetContact;
 using Contacts.Application.Contacts.Queries.GetContactsList;
 using Contacts.Application.Contacts.Queries.GetDetailedContact;

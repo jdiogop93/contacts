@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contacts.Application.Common.Exceptions;
 using Contacts.Application.Common.Interfaces;
+using Contacts.Application.Contacts.Common;
 using Contacts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
