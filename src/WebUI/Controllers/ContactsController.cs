@@ -1,4 +1,5 @@
-﻿using Contacts.Application.Common.Models;
+﻿using System.Collections;
+using Contacts.Application.Common.Models;
 using Contacts.Application.Contacts.Commands;
 using Contacts.Application.Contacts.Commands.CreateContact;
 using Contacts.Application.Contacts.Commands.DisableContact;
@@ -6,6 +7,7 @@ using Contacts.Application.Contacts.Commands.UpdateContact;
 using Contacts.Application.Contacts.Commands.UploadContactPhoto;
 using Contacts.Application.Contacts.Common;
 using Contacts.Application.Contacts.Queries.GetContact;
+using Contacts.Application.Contacts.Queries.GetContactPhoto;
 using Contacts.Application.Contacts.Queries.GetContactsList;
 using Contacts.Application.Contacts.Queries.GetDetailedContact;
 using Contacts.Infrastructure.Files;
@@ -75,6 +77,12 @@ public class ContactsController : ApiControllerBase
     }
 
 
+    /// <summary>
+    /// upload contact photo
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="photo"></param>
+    /// <returns></returns>
     [HttpPatch("upload-photo/{id}")]
     public async Task<ActionResult> UploadPhoto(int id, IFormFile photo)
     {
@@ -87,6 +95,27 @@ public class ContactsController : ApiControllerBase
         {
             _logger.LogError($"ERROR => PATCH contacts/upload-photo/{id}", ex);
             return BadRequest(ex.Message);
+        }
+    }
+
+
+    /// <summary>
+    /// get contact photo
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("get-photo/{id}")]
+    public async Task<FileStreamResult> GetPhoto(int id)
+    {
+        try
+        {
+            var media = await Mediator.Send(new GetContactPhotoQuery(id));
+            return new FileStreamResult(new MemoryStream(media.Bytes), media.MimeType) { FileDownloadName = media.FileName };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"ERROR => GET contacts/get-photo/{id}", ex);
+            throw;
         }
     }
 
