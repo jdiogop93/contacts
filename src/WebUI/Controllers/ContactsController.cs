@@ -3,6 +3,7 @@ using Contacts.Application.Contacts.Commands;
 using Contacts.Application.Contacts.Commands.CreateContact;
 using Contacts.Application.Contacts.Commands.DisableContact;
 using Contacts.Application.Contacts.Commands.UpdateContact;
+using Contacts.Application.Contacts.Commands.UploadContactPhoto;
 using Contacts.Application.Contacts.Common;
 using Contacts.Application.Contacts.Queries.GetContact;
 using Contacts.Application.Contacts.Queries.GetContactsList;
@@ -10,6 +11,8 @@ using Contacts.Application.Contacts.Queries.GetDetailedContact;
 using Contacts.Infrastructure.Files;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 
 namespace Contacts.WebUI.Controllers;
@@ -67,6 +70,22 @@ public class ContactsController : ApiControllerBase
         catch (Exception ex)
         {
             _logger.LogError("ERROR => POST contacts", ex);
+            return BadRequest(ex.Message);
+        }
+    }
+
+
+    [HttpPatch("upload-photo/{id}")]
+    public async Task<ActionResult> UploadPhoto(int id, IFormFile photo)
+    {
+        try
+        {
+            await Mediator.Send(new UploadContactPhotoCommand { Id = id, Photo = photo });
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"ERROR => PATCH contacts/upload-photo/{id}", ex);
             return BadRequest(ex.Message);
         }
     }

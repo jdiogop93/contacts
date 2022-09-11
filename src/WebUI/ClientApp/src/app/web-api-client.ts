@@ -308,6 +308,7 @@ export class ContactGroupsClient implements IContactGroupsClient {
 export interface IContactsClient {
     getList(sortBy: string | null | undefined, sortDesc: boolean | null | undefined, rowsPerPage: number | undefined, page: number | undefined, search: string | null | undefined): Observable<PaginatedListOfContactListItemDto>;
     create(command: CreateContactCommand): Observable<number>;
+    uploadPhoto(id: number, photo: FileParameter | null | undefined): Observable<FileResponse>;
     get(id: number): Observable<ContactItemDto>;
     update(id: number, command: UpdateContactCommand): Observable<FileResponse>;
     getDetailed(id: number): Observable<ContactDetailedDto>;
@@ -434,6 +435,60 @@ export class ContactsClient implements IContactsClient {
     
             return _observableOf(result200);
             }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    uploadPhoto(id: number, photo: FileParameter | null | undefined): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/Contacts/upload-photo/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (photo !== null && photo !== undefined)
+            content_.append("photo", photo.data, photo.fileName ? photo.fileName : "photo");
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("patch", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUploadPhoto(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUploadPhoto(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileResponse>;
+        }));
+    }
+
+    protected processUploadPhoto(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -2311,10 +2366,7 @@ export class UpdateContactCommand implements IUpdateContactCommand {
     id?: number;
     firstName?: string;
     lastName?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
+    address?: AddressDto;
     email?: string;
     numbers?: ContactNumberDto[];
 
@@ -2332,10 +2384,7 @@ export class UpdateContactCommand implements IUpdateContactCommand {
             this.id = _data["id"];
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
-            this.street = _data["street"];
-            this.zipCode = _data["zipCode"];
-            this.city = _data["city"];
-            this.country = _data["country"];
+            this.address = _data["address"] ? AddressDto.fromJS(_data["address"]) : <any>undefined;
             this.email = _data["email"];
             if (Array.isArray(_data["numbers"])) {
                 this.numbers = [] as any;
@@ -2357,10 +2406,7 @@ export class UpdateContactCommand implements IUpdateContactCommand {
         data["id"] = this.id;
         data["firstName"] = this.firstName;
         data["lastName"] = this.lastName;
-        data["street"] = this.street;
-        data["zipCode"] = this.zipCode;
-        data["city"] = this.city;
-        data["country"] = this.country;
+        data["address"] = this.address ? this.address.toJSON() : <any>undefined;
         data["email"] = this.email;
         if (Array.isArray(this.numbers)) {
             data["numbers"] = [];
@@ -2375,10 +2421,7 @@ export interface IUpdateContactCommand {
     id?: number;
     firstName?: string;
     lastName?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
+    address?: AddressDto;
     email?: string;
     numbers?: ContactNumberDto[];
 }
@@ -3048,6 +3091,11 @@ export interface IWeatherForecast {
     temperatureC?: number;
     temperatureF?: number;
     summary?: string | undefined;
+}
+
+export interface FileParameter {
+    data: any;
+    fileName: string;
 }
 
 export interface FileResponse {

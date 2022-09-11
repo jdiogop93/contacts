@@ -13,19 +13,11 @@ namespace Contacts.Application.Contacts.Commands.UpdateContact;
 
 public record UpdateContactCommand : IRequest
 {
-    //photo
     public int Id { get; set; }
 
     public string FirstName { get; set; }
     public string LastName { get; set; }
-
-    #region Address
-    public string Street { get; set; }
-    public string ZipCode { get; set; }
-    public string City { get; set; }
-    public string Country { get; set; }
-    #endregion
-
+    public AddressDto Address { get; set; }
     public string Email { get; set; }
     public HashSet<ContactNumberDto> Numbers { get; set; }
 }
@@ -56,7 +48,7 @@ public class UpdateContactCommandHandler : IRequestHandler<UpdateContactCommand>
         entity.FirstName = request.FirstName;
         entity.LastName = request.LastName;
         entity.Initials = ContactHelper.RetrieveInitialsOfNames(entity.FirstName, entity.LastName);
-        entity.Address = new Address(request.Street, request.ZipCode, request.City, request.Country);
+        entity.Address = new Address(request.Address.Street, request.Address.ZipCode, request.Address.City, request.Address.Country);
         entity.Email = request.Email;
         entity.LastModified = currentTime;
 

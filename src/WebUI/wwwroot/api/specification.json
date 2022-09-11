@@ -314,6 +314,55 @@
         }
       }
     },
+    "/api/Contacts/upload-photo/{id}": {
+      "patch": {
+        "tags": [
+          "Contacts"
+        ],
+        "operationId": "Contacts_UploadPhoto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Contacts/{id}": {
       "get": {
         "tags": [
@@ -1362,17 +1411,8 @@
           "lastName": {
             "type": "string"
           },
-          "street": {
-            "type": "string"
-          },
-          "zipCode": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
+          "address": {
+            "$ref": "#/components/schemas/AddressDto"
           },
           "email": {
             "type": "string"

@@ -2,16 +2,15 @@
 
 public class Media : ValueObject
 {
-    public byte[] Bytes { get; private set; }
+    public byte[] Bytes { get; set; }
     public string FileName { get; private set; }
     public string MimeType { get; private set; }
     public long Size { get; private set; }
 
     private Media() { }
 
-    public Media(byte[] bytes, string fileName, string mimeType, long size)
+    public Media(string fileName, string mimeType, long size)
     {
-        Bytes = bytes;
         FileName = fileName;
         MimeType = mimeType;
         Size = size;
