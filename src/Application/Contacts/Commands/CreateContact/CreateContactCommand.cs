@@ -1,4 +1,5 @@
-﻿using Contacts.Application.Common.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using Contacts.Application.Common.Interfaces;
 using Contacts.Application.Contacts.Commands.Common;
 using Contacts.Application.Contacts.Common;
 using Contacts.Domain.Entities;
@@ -10,10 +11,18 @@ namespace Contacts.Application.Contacts.Commands.CreateContact;
 
 public record CreateContactCommand : IRequest<int>
 {
+    [Required]
     public string FirstName { get; set; }
+
+    [Required]
     public string LastName { get; set; }
+
+    [Required]
     public AddressDto Address { get; set; }
+
+    [Required]
     public string Email { get; set; }
+
     public HashSet<ContactNumberDto> Numbers { get; set; }
 }
 

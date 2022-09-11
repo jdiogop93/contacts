@@ -1,4 +1,5 @@
-﻿using Contacts.Application.Common.Exceptions;
+﻿using System.ComponentModel.DataAnnotations;
+using Contacts.Application.Common.Exceptions;
 using Contacts.Application.Common.Interfaces;
 using Contacts.Application.Contacts.Commands.Common;
 using Contacts.Application.Contacts.Common;
@@ -8,6 +9,7 @@ using Contacts.Domain.ValueObjects;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using ValidationException = Contacts.Application.Common.Exceptions.ValidationException;
 
 namespace Contacts.Application.Contacts.Commands.UpdateContact;
 
@@ -15,11 +17,19 @@ public record UpdateContactCommand : IRequest
 {
     public int Id { get; set; }
 
+    [Required]
     public string FirstName { get; set; }
+
+    [Required]
     public string LastName { get; set; }
+
+    [Required]
     public AddressDto Address { get; set; }
+
+    [Required]
     public string Email { get; set; }
-    public HashSet<ContactNumberDto> Numbers { get; set; }
+
+    public HashSet<ContactNumberItemDto> Numbers { get; set; }
 }
 
 public class UpdateContactCommandHandler : IRequestHandler<UpdateContactCommand>
@@ -35,7 +45,7 @@ public class UpdateContactCommandHandler : IRequestHandler<UpdateContactCommand>
     {
         var entity = await _context.Contacts
             .Where(l => l.Id == request.Id && l.Active)
-            .Include(x => x.Numbers.Where(n => n.Active)) //ver se é preciso filtrar pelos deste ContactId apenas
+            .Include(x => x.Numbers.Where(n => n.Active))
             .SingleOrDefaultAsync(cancellationToken);
 
         if (entity == null)
@@ -160,7 +170,7 @@ public class UpdateContactCommandHandler : IRequestHandler<UpdateContactCommand>
         return Unit.Value;
     }
 
-    private ContactNumber ValidateContactNumber(Contact entity, ContactNumberDto n, List<ContactNumberDto> numbersReq, string action)
+    private ContactNumber ValidateContactNumber(Contact entity, ContactNumberItemDto n, List<ContactNumberItemDto> numbersReq, string action)
     {
         var line = entity.Numbers.FirstOrDefault(x => x.Id == n.Id);
         if (line == null) //if this contact number doest not exist, throw exception

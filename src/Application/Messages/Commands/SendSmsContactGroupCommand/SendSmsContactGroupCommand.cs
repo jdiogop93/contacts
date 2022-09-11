@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 using Contacts.Application.Common.Exceptions;
 using Contacts.Application.Common.Interfaces;
 using Contacts.Domain.Entities;
@@ -6,42 +7,45 @@ using Contacts.Domain.Enums;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using ValidationException = Contacts.Application.Common.Exceptions.ValidationException;
 
 namespace Contacts.Application.Messages.Commands;
 
 //[Authorize]
-public record SendEmailContactGroupCommand : IRequest<int>
+public record SendSmsContactGroupCommand : IRequest<int>
 {
+    [Required]
     public int Id { get; set; } //ContactGroupId
 
-    public string Subject { get; set; }
-    public string Content { get; set; }
+    [Required]
+    public string Message { get; set; }
 }
 
-public class SendEmailContactGroupCommandHandler : IRequestHandler<SendEmailContactGroupCommand, int>
+public class SendSmsContactGroupCommandHandler : IRequestHandler<SendSmsContactGroupCommand, int>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
-    private readonly IMailService _mailService;
+    private readonly ISmsService _smsService;
 
-    public SendEmailContactGroupCommandHandler
+    public SendSmsContactGroupCommandHandler
     (
         IApplicationDbContext context,
         IMapper mapper,
-        IMailService mailService
+        ISmsService smsService
     )
     {
         _context = context;
         _mapper = mapper;
-        _mailService = mailService;
+        _smsService = smsService;
     }
 
-    public async Task<int> Handle(SendEmailContactGroupCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(SendSmsContactGroupCommand request, CancellationToken cancellationToken)
     {
         var entity = await _context.ContactGroups
             .Where(l => l.Id == request.Id && l.Active)
             .Include(x => x.Contacts.Where(n => n.Active))
             .ThenInclude(x => x.Contact)
+            .ThenInclude(x => x.Numbers.Where(n => n.Default && n.Active).Take(1))
             .SingleOrDefaultAsync(cancellationToken);
 
         if (entity == null)
@@ -49,17 +53,18 @@ public class SendEmailContactGroupCommandHandler : IRequestHandler<SendEmailCont
             throw new NotFoundException(nameof(ContactGroup), request.Id);
         }
 
-        var emails = entity.Contacts
-            .Where(c => c.Contact.Active)
-            .Select(c => c.Contact.Email)
-            .ToList();
+        var phoneNumbers = entity.Contacts
+            .Select(x => x.Contact)
+            .SelectMany(x => x.Numbers)
+            .Select(n => $"{n.CountryCode}{n.PhoneNumber}".Replace("+", ""))
+            .ToArray();
 
-        if (emails.Count == 0)
+        if (phoneNumbers.Length == 0)
         {
             throw new ValidationException(
                 new List<ValidationFailure>
                 {
-                    new ValidationFailure(nameof(ContactNumber), $"The contact group ({entity.Id}) doesnt have valid contact emails to send an email.")
+                    new ValidationFailure(nameof(ContactNumber), $"The contact group ({entity.Id}) doesnt have valid contact phone numbers to send a message.")
                 }
             );
         }
@@ -68,24 +73,23 @@ public class SendEmailContactGroupCommandHandler : IRequestHandler<SendEmailCont
         var result = status.ToString();
         try
         {
-            _mailService.Send(
-                emails,
-                request.Subject,
-                request.Content
+            await _smsService.SendAsync(
+                phoneNumbers,
+                request.Message,
+                entity.Name
             );
         }
         catch (Exception ex)
         {
             status = MessageResultStatus.ERROR;
-            result = ex.ToString();
+            result = ex.Message;
         }
 
         var message = new Message
         {
-            Type = MessageType.EMAIL,
-            Subject = request.Subject,
-            Content = request.Content,
-            EmailsTo = string.Join(";", emails),
+            Type = MessageType.SMS,
+            Content = request.Message,
+            PhoneNumbers = string.Join(";", phoneNumbers),
             ResultStatus = status,
             Result = result
         };

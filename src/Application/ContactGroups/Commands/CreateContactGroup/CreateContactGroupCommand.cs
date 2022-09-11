@@ -1,4 +1,5 @@
-﻿using Contacts.Application.Common.Exceptions;
+﻿using System.ComponentModel.DataAnnotations;
+using Contacts.Application.Common.Exceptions;
 using Contacts.Application.Common.Interfaces;
 using Contacts.Domain.Entities;
 using MediatR;
@@ -7,6 +8,7 @@ namespace Contacts.Application.ContactGroups.Commands.CreateContactGroup;
 
 public record CreateContactGroupCommand : IRequest<int>
 {
+    [Required]
     public string Name { get; set; }
 
     public HashSet<int> ContactsIds { get; set; }

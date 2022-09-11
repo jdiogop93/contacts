@@ -38,7 +38,7 @@ public class MessagesController : ApiControllerBase
     {
         try
         {
-            _mailService.Send(new List<string> { _configuration["Smtp:Username"] }, "test subject", "this is a test body email");
+            _mailService.Send(new List<string> { to }, "test subject", "this is a test body email");
             return NoContent();
         }
         catch (Exception ex)

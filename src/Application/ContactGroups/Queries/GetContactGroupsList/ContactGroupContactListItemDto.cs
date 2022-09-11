@@ -10,4 +10,5 @@ public class ContactGroupContactListItemDto
     public string LastName { get; set; }
     public string Initials { get; set; }
     public string Email { get; set; }
+    public string DefaultPhoneNumber { get; set; }
 }

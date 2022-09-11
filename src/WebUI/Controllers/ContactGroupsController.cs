@@ -1,4 +1,5 @@
-﻿using Contacts.Application.Common.Models;
+﻿using Contacts.Application.Common.Exceptions;
+using Contacts.Application.Common.Models;
 using Contacts.Application.ContactGroups.Commands.CreateContactGroup;
 using Contacts.Application.ContactGroups.Commands.DisableContactGroup;
 using Contacts.Application.ContactGroups.Commands.UpdateContactGroup;

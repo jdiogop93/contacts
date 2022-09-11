@@ -1141,6 +1141,7 @@ export class ContactGroupContactListItemDto implements IContactGroupContactListI
     lastName?: string;
     initials?: string;
     email?: string;
+    defaultPhoneNumber?: string;
 
     constructor(data?: IContactGroupContactListItemDto) {
         if (data) {
@@ -1159,6 +1160,7 @@ export class ContactGroupContactListItemDto implements IContactGroupContactListI
             this.lastName = _data["lastName"];
             this.initials = _data["initials"];
             this.email = _data["email"];
+            this.defaultPhoneNumber = _data["defaultPhoneNumber"];
         }
     }
 
@@ -1177,6 +1179,7 @@ export class ContactGroupContactListItemDto implements IContactGroupContactListI
         data["lastName"] = this.lastName;
         data["initials"] = this.initials;
         data["email"] = this.email;
+        data["defaultPhoneNumber"] = this.defaultPhoneNumber;
         return data;
     }
 }
@@ -1188,6 +1191,7 @@ export interface IContactGroupContactListItemDto {
     lastName?: string;
     initials?: string;
     email?: string;
+    defaultPhoneNumber?: string;
 }
 
 export class ContactDto implements IContactDto {
@@ -1301,9 +1305,9 @@ export interface IContactDetailedDto extends IContactDto {
 
 export class ContactNumberDetailedDto implements IContactNumberDetailedDto {
     id?: number;
-    countryCode?: string;
-    phoneNumber?: string;
-    type?: ContactNumberTypeEnum;
+    countryCode!: string;
+    phoneNumber!: string;
+    type!: ContactNumberTypeEnum;
     default?: boolean;
 
     constructor(data?: IContactNumberDetailedDto) {
@@ -1345,9 +1349,9 @@ export class ContactNumberDetailedDto implements IContactNumberDetailedDto {
 
 export interface IContactNumberDetailedDto {
     id?: number;
-    countryCode?: string;
-    phoneNumber?: string;
-    type?: ContactNumberTypeEnum;
+    countryCode: string;
+    phoneNumber: string;
+    type: ContactNumberTypeEnum;
     default?: boolean;
 }
 
@@ -1443,7 +1447,7 @@ export interface IContactNumberDto extends IContactNumberDetailedDto {
 }
 
 export class CreateContactGroupCommand implements ICreateContactGroupCommand {
-    name?: string;
+    name!: string;
     contactsIds?: number[];
 
     constructor(data?: ICreateContactGroupCommand) {
@@ -1486,13 +1490,13 @@ export class CreateContactGroupCommand implements ICreateContactGroupCommand {
 }
 
 export interface ICreateContactGroupCommand {
-    name?: string;
+    name: string;
     contactsIds?: number[];
 }
 
 export class UpdateContactGroupCommand implements IUpdateContactGroupCommand {
     id?: number;
-    name?: string;
+    name!: string;
     contactsIdsToSave?: number[];
     contactsIdsToDelete?: number[];
 
@@ -1549,7 +1553,7 @@ export class UpdateContactGroupCommand implements IUpdateContactGroupCommand {
 
 export interface IUpdateContactGroupCommand {
     id?: number;
-    name?: string;
+    name: string;
     contactsIdsToSave?: number[];
     contactsIdsToDelete?: number[];
 }
@@ -1663,10 +1667,10 @@ export interface IContactListItemDto {
 }
 
 export class CreateContactCommand implements ICreateContactCommand {
-    firstName?: string;
-    lastName?: string;
-    address?: AddressDto;
-    email?: string;
+    firstName!: string;
+    lastName!: string;
+    address!: AddressDto;
+    email!: string;
     numbers?: ContactNumberDto[];
 
     constructor(data?: ICreateContactCommand) {
@@ -1676,13 +1680,16 @@ export class CreateContactCommand implements ICreateContactCommand {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.address = new AddressDto();
+        }
     }
 
     init(_data?: any) {
         if (_data) {
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
-            this.address = _data["address"] ? AddressDto.fromJS(_data["address"]) : <any>undefined;
+            this.address = _data["address"] ? AddressDto.fromJS(_data["address"]) : new AddressDto();
             this.email = _data["email"];
             if (Array.isArray(_data["numbers"])) {
                 this.numbers = [] as any;
@@ -1715,10 +1722,10 @@ export class CreateContactCommand implements ICreateContactCommand {
 }
 
 export interface ICreateContactCommand {
-    firstName?: string;
-    lastName?: string;
-    address?: AddressDto;
-    email?: string;
+    firstName: string;
+    lastName: string;
+    address: AddressDto;
+    email: string;
     numbers?: ContactNumberDto[];
 }
 
@@ -1776,11 +1783,11 @@ export interface IContactItemDto {
 
 export class UpdateContactCommand implements IUpdateContactCommand {
     id?: number;
-    firstName?: string;
-    lastName?: string;
-    address?: AddressDto;
-    email?: string;
-    numbers?: ContactNumberDto[];
+    firstName!: string;
+    lastName!: string;
+    address!: AddressDto;
+    email!: string;
+    numbers?: ContactNumberItemDto[];
 
     constructor(data?: IUpdateContactCommand) {
         if (data) {
@@ -1789,6 +1796,9 @@ export class UpdateContactCommand implements IUpdateContactCommand {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.address = new AddressDto();
+        }
     }
 
     init(_data?: any) {
@@ -1796,12 +1806,12 @@ export class UpdateContactCommand implements IUpdateContactCommand {
             this.id = _data["id"];
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
-            this.address = _data["address"] ? AddressDto.fromJS(_data["address"]) : <any>undefined;
+            this.address = _data["address"] ? AddressDto.fromJS(_data["address"]) : new AddressDto();
             this.email = _data["email"];
             if (Array.isArray(_data["numbers"])) {
                 this.numbers = [] as any;
                 for (let item of _data["numbers"])
-                    this.numbers!.push(ContactNumberDto.fromJS(item));
+                    this.numbers!.push(ContactNumberItemDto.fromJS(item));
             }
         }
     }
@@ -1831,17 +1841,50 @@ export class UpdateContactCommand implements IUpdateContactCommand {
 
 export interface IUpdateContactCommand {
     id?: number;
-    firstName?: string;
-    lastName?: string;
-    address?: AddressDto;
-    email?: string;
-    numbers?: ContactNumberDto[];
+    firstName: string;
+    lastName: string;
+    address: AddressDto;
+    email: string;
+    numbers?: ContactNumberItemDto[];
+}
+
+export class ContactNumberItemDto extends ContactNumberDto implements IContactNumberItemDto {
+    type!: number;
+
+    constructor(data?: IContactNumberItemDto) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.type = _data["type"];
+        }
+    }
+
+    static override fromJS(data: any): ContactNumberItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactNumberItemDto();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["type"] = this.type;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IContactNumberItemDto extends IContactNumberDto {
+    type: number;
 }
 
 export class SendEmailContactGroupCommand implements ISendEmailContactGroupCommand {
-    id?: number;
-    subject?: string;
-    content?: string;
+    id!: number;
+    subject!: string;
+    content!: string;
 
     constructor(data?: ISendEmailContactGroupCommand) {
         if (data) {
@@ -1877,14 +1920,14 @@ export class SendEmailContactGroupCommand implements ISendEmailContactGroupComma
 }
 
 export interface ISendEmailContactGroupCommand {
-    id?: number;
-    subject?: string;
-    content?: string;
+    id: number;
+    subject: string;
+    content: string;
 }
 
 export class SendSmsContactGroupCommand implements ISendSmsContactGroupCommand {
-    id?: number;
-    message?: string;
+    id!: number;
+    message!: string;
 
     constructor(data?: ISendSmsContactGroupCommand) {
         if (data) {
@@ -1918,8 +1961,8 @@ export class SendSmsContactGroupCommand implements ISendSmsContactGroupCommand {
 }
 
 export interface ISendSmsContactGroupCommand {
-    id?: number;
-    message?: string;
+    id: number;
+    message: string;
 }
 
 export interface FileParameter {

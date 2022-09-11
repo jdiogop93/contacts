@@ -13,9 +13,17 @@ public class UpdateContactGroupCommandValidator : AbstractValidator<UpdateContac
         _context = context;
 
         RuleFor(v => v.Name)
-            .NotEmpty().WithMessage("Name is required.")
-            .MaximumLength(200).WithMessage("Name must not exceed 200 characters.")
-            .MustAsync(BeUniqueName).WithMessage("The specified name already exists.");
+            .NotEmpty().NotEmpty().WithMessage("The field «Name» is mandatory.")
+            .MaximumLength(200).WithMessage("You can write a maximum of 200 characters in «Name».")
+            .MustAsync(BeUniqueName).WithMessage("The specified «Name» already exists.");
+
+        RuleFor(x => x.ContactsIdsToSave)
+            .NotNull().Must((x,y) => x.ContactsIdsToSave.Count > 0).WithMessage("The list «ContactsIdsToSave» must have elements.")
+            .When(x => x.ContactsIdsToDelete.Count == 0);
+
+        RuleFor(x => x.ContactsIdsToDelete)
+            .NotNull().Must((x, y) => x.ContactsIdsToDelete.Count > 0).WithMessage("The list «ContactsIdsToDelete» must have elements.")
+            .When(x => x.ContactsIdsToSave.Count == 0);
     }
 
     public async Task<bool> BeUniqueName(UpdateContactGroupCommand model, string name, CancellationToken cancellationToken)

@@ -85,23 +85,23 @@ public class ApplicationDbContextInitialiser
                 //1
                 new Contact
                 {
-                    FirstName = "José",
+                    FirstName = "Américo",
                     LastName = "Pereira",
-                    Initials = "JP",
+                    Initials = "AP",
                     Address = new Domain.ValueObjects.Address("Nogueira", "4900", "Viana do Castelo", "Portugal"),
-                    Email = "jdiogopereira93@gmail.com",
+                    Email = "jde93pereira@gmail.com", //"americo.pereira@emailteste.pt",
                     Numbers = new List<ContactNumber>
                     {
                         new ContactNumber
                         {
-                            CountryCode = "+351",
-                            PhoneNumber = "961052627",
+                            CountryCode = "+111",
+                            PhoneNumber = "111111111",
                             Type = Domain.Enums.ContactNumberType.HOME
                         },
                         new ContactNumber
                         {
                             CountryCode = "+351",
-                            PhoneNumber = "910457506",
+                            PhoneNumber = "961052627",
                             Type = Domain.Enums.ContactNumberType.MOBILE,
                             Default = true
                         }
@@ -110,11 +110,71 @@ public class ApplicationDbContextInitialiser
                 //2
                 new Contact
                 {
-                    FirstName = "Catarina",
-                    LastName = "Pereira",
-                    Initials = "CP",
+                    FirstName = "Bárbara",
+                    LastName = "Fernandes",
+                    Initials = "BF",
                     Address = new Domain.ValueObjects.Address("Massarelos", "4901", "Porto", "Portugal"),
-                    Email = "jde93pereira@gmail.com"
+                    Email = "ze.diogo.pereira@hotmail.com", //"barbara.fernandes@emailteste.pt",
+                    Numbers = new List<ContactNumber>
+                    {
+                        new ContactNumber
+                        {
+                            CountryCode = "+333",
+                            PhoneNumber = "333333333",
+                            Type = Domain.Enums.ContactNumberType.WORK
+                        },
+                        new ContactNumber
+                        {
+                            CountryCode = "+351",
+                            PhoneNumber = "961052627",
+                            Type = Domain.Enums.ContactNumberType.MOBILE,
+                            Default = true
+                        }
+                    }
+                },
+                //3
+                new Contact
+                {
+                    FirstName = "Tiago",
+                    LastName = "Carvalho",
+                    Initials = "TC",
+                    Address = new Domain.ValueObjects.Address("Figueira da Foz", "5678", "Coimbra", "Portugal"),
+                    Email = "diogo-85@sapo.pt", //"tiago.carvalho@emailteste.pt",
+                    Numbers = new List<ContactNumber>
+                    {
+                        new ContactNumber
+                        {
+                            CountryCode = "+555",
+                            PhoneNumber = "555555555",
+                            Type = Domain.Enums.ContactNumberType.HOME
+                        },
+                        new ContactNumber
+                        {
+                            CountryCode = "+351",
+                            PhoneNumber = "961052627",
+                            Type = Domain.Enums.ContactNumberType.WORK,
+                            Default = true
+                        }
+                    }
+                },
+                //4
+                new Contact
+                {
+                    FirstName = "Rodrigo",
+                    LastName = "Poiares",
+                    Initials = "RP",
+                    Address = new Domain.ValueObjects.Address("Nazaré", "4445", "Leiria", "Portugal"),
+                    Email = "rodrigo.poiares@emailteste.pt",
+                    Numbers = new List<ContactNumber>
+                    {
+                        new ContactNumber
+                        {
+                            CountryCode = "+777",
+                            PhoneNumber = "777777777",
+                            Type = Domain.Enums.ContactNumberType.MOBILE,
+                            Default = true
+                        }
+                    }
                 }
             };
             _context.Contacts.AddRange(contactsToAdd);
@@ -144,7 +204,7 @@ public class ApplicationDbContextInitialiser
                     new ContactNumber
                     {
                         CountryCode = "+351",
-                        PhoneNumber = $"960000{idx}",
+                        PhoneNumber = $"960000{phone}",
                         Type = Domain.Enums.ContactNumberType.MOBILE,
                         Default = true
                     }
@@ -174,18 +234,50 @@ public class ApplicationDbContextInitialiser
     {
         if (!_context.ContactGroupContacts.Any(x => x.Active))
         {
-            var firstGroup = _context.ContactGroups
+            #region Group A
+            var groupA = _context.ContactGroups
                 .FirstOrDefault(x => x.Name == "Group A");
 
-            var contacts = _context.Contacts
-                .Where(x => x.Initials.Contains("JP") || x.Initials.Contains("CP"))
+            var contactsA = _context.Contacts
+                .Where(x => x.Initials.Contains("AP") || x.Initials.Contains("BF"))
                 .ToList();
 
-            var groupContacts = contacts
-                .Select(x => new ContactGroupContact { ContactId = x.Id, ContactGroupId = firstGroup.Id })
+            var groupContactsA = contactsA
+                .Select(x => new ContactGroupContact { ContactId = x.Id, ContactGroupId = groupA.Id })
                 .ToList();
 
-            _context.ContactGroupContacts.AddRange(groupContacts);
+            _context.ContactGroupContacts.AddRange(groupContactsA);
+            #endregion
+
+            #region Group B
+            var groupB = _context.ContactGroups
+                .FirstOrDefault(x => x.Name == "Group B");
+
+            var contactsB = _context.Contacts
+                .Where(x => x.Initials.Contains("TC"))
+                .ToList();
+
+            var groupContactsB = contactsB
+                .Select(x => new ContactGroupContact { ContactId = x.Id, ContactGroupId = groupB.Id })
+                .ToList();
+
+            _context.ContactGroupContacts.AddRange(groupContactsB);
+            #endregion
+
+            #region Group C
+            var groupC = _context.ContactGroups
+                .FirstOrDefault(x => x.Name == "Group C");
+
+            var contactsC = _context.Contacts
+                .Where(x => x.Initials.Contains("RP"))
+                .ToList();
+
+            var groupContactsC = contactsC
+                .Select(x => new ContactGroupContact { ContactId = x.Id, ContactGroupId = groupC.Id })
+                .ToList();
+
+            _context.ContactGroupContacts.AddRange(groupContactsC);
+            #endregion
         }
     }
 

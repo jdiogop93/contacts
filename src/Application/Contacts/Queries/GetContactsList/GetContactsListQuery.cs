@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using AutoMapper;
 using Contacts.Application.Common;
 using Contacts.Application.Common.Interfaces;
@@ -16,11 +15,15 @@ namespace Contacts.Application.Contacts.Queries.GetContactsList;
 public record GetContactsListQuery : IRequest<PaginatedList<ContactListItemDto>>
 {
     public string? SortBy { get; set; }
+
     public bool? SortDesc { get; set; }
+
     [Required]
     public int RowsPerPage { get; set; }
+
     [Required]
     public int Page { get; set; }
+
     public string? Search { get; set; }
 }
 
@@ -35,7 +38,7 @@ public class GetContactsListQueryHandler : IRequestHandler<GetContactsListQuery,
         _mapper = mapper;
     }
 
-    public enum SortByValuesEnum
+    private enum SortByValuesEnum
     {
         Name,
         DefaultPhoneNumber
@@ -48,36 +51,6 @@ public class GetContactsListQueryHandler : IRequestHandler<GetContactsListQuery,
             SortByValuesEnum.Name.ToString().ToLower(),
             SortByValuesEnum.DefaultPhoneNumber.ToString().ToLower()
         };
-    }
-
-    private IOrderedQueryable<Contact> ApplyOrderBy(IQueryable<Contact> query, string field, bool sortDesc)
-    {
-        if (sortDesc)
-        {
-            if (field == SortByValuesEnum.DefaultPhoneNumber.ToString().ToLower())
-            {
-                return query.OrderByDescending(x => x.Numbers.First().CountryCode)
-                    .ThenByDescending(x => x.Numbers.First().PhoneNumber);
-            }
-            else //Name
-            {
-                return query.OrderByDescending(x => x.FirstName)
-                    .ThenByDescending(x => x.LastName);
-            }
-        }
-        else
-        {
-            if (field == SortByValuesEnum.DefaultPhoneNumber.ToString().ToLower())
-            {
-                return query.OrderBy(x => x.Numbers.First().CountryCode)
-                    .ThenBy(x => x.Numbers.First().PhoneNumber);
-            }
-            else //Name
-            {
-                return query.OrderBy(x => x.FirstName)
-                    .ThenBy(x => x.LastName);
-            }
-        }
     }
 
     public async Task<PaginatedList<ContactListItemDto>> Handle(GetContactsListQuery request, CancellationToken cancellationToken)
@@ -117,5 +90,37 @@ public class GetContactsListQueryHandler : IRequestHandler<GetContactsListQuery,
             })
             .PaginatedListAsync(request.Page, request.RowsPerPage);
     }
+
+    #region private methods
+    private IOrderedQueryable<Contact> ApplyOrderBy(IQueryable<Contact> query, string field, bool sortDesc)
+    {
+        if (sortDesc)
+        {
+            if (field == SortByValuesEnum.DefaultPhoneNumber.ToString().ToLower())
+            {
+                return query.OrderByDescending(x => x.Numbers.First().CountryCode)
+                    .ThenByDescending(x => x.Numbers.First().PhoneNumber);
+            }
+            else //Name
+            {
+                return query.OrderByDescending(x => x.FirstName)
+                    .ThenByDescending(x => x.LastName);
+            }
+        }
+        else
+        {
+            if (field == SortByValuesEnum.DefaultPhoneNumber.ToString().ToLower())
+            {
+                return query.OrderBy(x => x.Numbers.First().CountryCode)
+                    .ThenBy(x => x.Numbers.First().PhoneNumber);
+            }
+            else //Name
+            {
+                return query.OrderBy(x => x.FirstName)
+                    .ThenBy(x => x.LastName);
+            }
+        }
+    }
+    #endregion
 
 }

@@ -1,20 +1,23 @@
-﻿using Contacts.Application.Common.Exceptions;
+﻿using System.ComponentModel.DataAnnotations;
+using Contacts.Application.Common.Exceptions;
 using Contacts.Application.Common.Interfaces;
 using Contacts.Domain.Entities;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using ValidationException = Contacts.Application.Common.Exceptions.ValidationException;
 
 namespace Contacts.Application.ContactGroups.Commands.UpdateContactGroup;
 
 public record UpdateContactGroupCommand : IRequest
 {
     public int Id { get; set; }
+
+    [Required]
     public string Name { get; set; }
 
     public HashSet<int> ContactsIdsToSave { get; set; }
     public HashSet<int> ContactsIdsToDelete { get; set; }
-    //public HashSet<ContactOfGroupDto> Contacts { get; set; }
 }
 
 public class UpdateContactGroupCommandHandler : IRequestHandler<UpdateContactGroupCommand>

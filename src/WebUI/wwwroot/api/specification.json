@@ -767,6 +767,9 @@
           },
           "email": {
             "type": "string"
+          },
+          "defaultPhoneNumber": {
+            "type": "string"
           }
         }
       },
@@ -818,16 +821,23 @@
       "ContactNumberDetailedDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "countryCode",
+          "phoneNumber",
+          "type"
+        ],
         "properties": {
           "id": {
             "type": "integer",
             "format": "int32"
           },
           "countryCode": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "phoneNumber": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "$ref": "#/components/schemas/ContactNumberTypeEnum"
@@ -917,9 +927,13 @@
       "CreateContactGroupCommand": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "name"
+        ],
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "contactsIds": {
             "type": "array",
@@ -933,13 +947,17 @@
       "UpdateContactGroupCommand": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "integer",
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "contactsIdsToSave": {
             "type": "array",
@@ -1006,18 +1024,27 @@
       "CreateContactCommand": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "firstName",
+          "lastName",
+          "address",
+          "email"
+        ],
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "address": {
             "$ref": "#/components/schemas/AddressDto"
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "numbers": {
             "type": "array",
@@ -1052,57 +1079,98 @@
       "UpdateContactCommand": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "firstName",
+          "lastName",
+          "address",
+          "email"
+        ],
         "properties": {
           "id": {
             "type": "integer",
             "format": "int32"
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "address": {
             "$ref": "#/components/schemas/AddressDto"
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "numbers": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ContactNumberDto"
+              "$ref": "#/components/schemas/ContactNumberItemDto"
             }
           }
         }
       },
+      "ContactNumberItemDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContactNumberDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
       "SendEmailContactGroupCommand": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "subject",
+          "content"
+        ],
         "properties": {
           "id": {
             "type": "integer",
             "format": "int32"
           },
           "subject": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "content": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
       "SendSmsContactGroupCommand": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "message"
+        ],
         "properties": {
           "id": {
             "type": "integer",
             "format": "int32"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       }

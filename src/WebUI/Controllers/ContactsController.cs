@@ -42,7 +42,7 @@ public class ContactsController : ApiControllerBase
         catch (Exception ex)
         {
             _logger.LogError("ERROR => GET contacts/list", ex);
-            return BadRequest(ex.Message);
+            throw;
         }
     }
 
@@ -63,7 +63,7 @@ public class ContactsController : ApiControllerBase
         catch (Exception ex)
         {
             _logger.LogError("ERROR => POST contacts", ex);
-            return BadRequest(ex.Message);
+            throw;
         }
     }
 
@@ -85,7 +85,7 @@ public class ContactsController : ApiControllerBase
         catch (Exception ex)
         {
             _logger.LogError($"ERROR => PATCH contacts/upload-photo/{id}", ex);
-            return BadRequest(ex.Message);
+            throw;
         }
     }
 
@@ -162,7 +162,7 @@ public class ContactsController : ApiControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest();
+            return NotFound();
         }
 
         try

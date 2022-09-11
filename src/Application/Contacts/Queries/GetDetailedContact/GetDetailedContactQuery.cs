@@ -2,7 +2,6 @@
 using Contacts.Application.Common.Exceptions;
 using Contacts.Application.Common.Interfaces;
 using Contacts.Application.Contacts.Commands.Common;
-using Contacts.Application.Contacts.Common;
 using Contacts.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Contacts.Application.Contacts.Queries.GetDetailedContact;
 
 //[Authorize]
-public record GetDetailedContactQuery(int Id) : IRequest<ContactDetailedDto>;
+public record GetDetailedContactQuery(int Id) : IRequest<ContactDetailedItemDto>;
 
-public class GetDetailedContactQueryHandler : IRequestHandler<GetDetailedContactQuery, ContactDetailedDto>
+public class GetDetailedContactQueryHandler : IRequestHandler<GetDetailedContactQuery, ContactDetailedItemDto>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -23,7 +22,7 @@ public class GetDetailedContactQueryHandler : IRequestHandler<GetDetailedContact
         _mapper = mapper;
     }
 
-    public async Task<ContactDetailedDto> Handle(GetDetailedContactQuery request, CancellationToken cancellationToken)
+    public async Task<ContactDetailedItemDto> Handle(GetDetailedContactQuery request, CancellationToken cancellationToken)
     {
         var entity = await _context.Contacts
             .Where(l => l.Id == request.Id && l.Active)
@@ -35,7 +34,7 @@ public class GetDetailedContactQueryHandler : IRequestHandler<GetDetailedContact
             throw new NotFoundException(nameof(Contact), request.Id);
         }
 
-        var contactDto = new ContactDetailedDto
+        var contactDto = new ContactDetailedItemDto
         {
             Id = entity.Id,
             FirstName = entity.FirstName,
@@ -54,12 +53,12 @@ public class GetDetailedContactQueryHandler : IRequestHandler<GetDetailedContact
         if (entity.Numbers != null)
         {
             contactDto.Numbers = entity.Numbers
-                .Select(n => new ContactNumberDetailedDto
+                .Select(n => new ContactNumberItemDetailedDto
                 {
                     Id = n.Id,
                     CountryCode = n.CountryCode,
                     PhoneNumber = n.PhoneNumber,
-                    Type = (ContactNumberTypeEnum)n.Type,
+                    Type = n.Type.ToString(),
                     Default = n.Default
                 })
                 .ToList();

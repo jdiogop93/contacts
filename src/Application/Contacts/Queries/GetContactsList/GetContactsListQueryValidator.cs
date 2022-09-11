@@ -10,7 +10,7 @@ public class GetContactsListQueryValidator : AbstractValidator<GetContactsListQu
 
         RuleFor(x => x.SortBy)
             .Must((x, y) => sortByRangeValues.Any(s => s.ToLower() == x.SortBy?.ToLower()))
-            .WithMessage($"You did not insert a valid value for «SortBy». You can only sort the list by: {string.Join(",", sortByRangeValues)}.")
+            .WithMessage($"You did not insert a valid value for «SortBy». You can only sort the list by: {string.Join(", ", sortByRangeValues)}.")
             .When(x => !string.IsNullOrWhiteSpace(x.SortBy) && x.SortDesc.HasValue);
 
         RuleFor(x => x.RowsPerPage)
