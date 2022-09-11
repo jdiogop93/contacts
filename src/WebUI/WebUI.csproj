@@ -4,11 +4,8 @@
         <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>Contacts.WebUI</RootNamespace>
         <AssemblyName>Contacts.WebUI</AssemblyName>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <IsPackable>true</IsPackable>
-        <SpaRoot>ClientApp\</SpaRoot>
-        <SpaProxyServerUrl>http://localhost:8080</SpaProxyServerUrl>
-        <SpaProxyLaunchCommand>npm run serve</SpaProxyLaunchCommand>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>efad71c6-743c-4b87-9de8-f26d77146f6d</UserSecretsId>
     </PropertyGroup>
@@ -36,10 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!-- Don't publish the SPA source files, but do show them in the project files list -->
-        <Content Remove="$(SpaRoot)**" />
-        <None Remove="$(SpaRoot)**" />
-        <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+      <Folder Include="ClientApp\" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -48,16 +42,6 @@
 
     <Target Name="NSwag" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
         <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net60) run nswag.json /variables:Configuration=$(Configuration)" />
-    </Target>
-
-    <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
-        <!-- Ensure Node.js is installed -->
-        <Exec Command="node --version" ContinueOnError="true">
-            <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
-        </Exec>
-        <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
-        <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
-        <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
     </Target>
 
     <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">

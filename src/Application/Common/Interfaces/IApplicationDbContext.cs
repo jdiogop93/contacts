@@ -5,10 +5,6 @@ namespace Contacts.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
 {
-    DbSet<TodoList> TodoLists { get; }
-
-    DbSet<TodoItem> TodoItems { get; }
-
     DbSet<Contact> Contacts { get; }
 
     DbSet<ContactNumber> ContactNumbers { get; }

@@ -1,5 +1,4 @@
 ﻿using Contacts.Application.Common.Interfaces;
-using Contacts.Infrastructure.Files;
 using Contacts.Infrastructure.Identity;
 using Contacts.Infrastructure.Persistence;
 using Contacts.Infrastructure.Persistence.Interceptors;
@@ -41,11 +40,9 @@ public static class ConfigureServices
         services.AddIdentityServer()
             .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
-        services.AddTransient<IDateTime, DateTimeService>();
         services.AddTransient<IMailService, MailService>();
         services.AddTransient<ISmsService, SmsService>();
         services.AddTransient<IIdentityService, IdentityService>();
-        services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
 
         services.AddAuthentication()
             .AddIdentityServerJwt();

@@ -1,5 +1,4 @@
-﻿using Contacts.Application.Common.Interfaces;
-using Contacts.Domain.Common;
+﻿using Contacts.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -8,15 +7,14 @@ namespace Contacts.Infrastructure.Persistence.Interceptors;
 
 public class AuditableEntitySaveChangesInterceptor : SaveChangesInterceptor
 {
-    private readonly ICurrentUserService _currentUserService;
-    private readonly IDateTime _dateTime;
+    //private readonly ICurrentUserService _currentUserService;
 
-    public AuditableEntitySaveChangesInterceptor(
-        ICurrentUserService currentUserService,
-        IDateTime dateTime)
+    public AuditableEntitySaveChangesInterceptor
+    (
+        //ICurrentUserService currentUserService
+    )
     {
-        _currentUserService = currentUserService;
-        _dateTime = dateTime;
+        //_currentUserService = currentUserService;
     }
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
@@ -37,19 +35,21 @@ public class AuditableEntitySaveChangesInterceptor : SaveChangesInterceptor
     {
         if (context == null) return;
 
+        var currentTime = DateTime.UtcNow;
+
         foreach (var entry in context.ChangeTracker.Entries<BaseAuditableEntity>())
         {
             if (entry.State == EntityState.Added)
             {
                 //entry.Entity.CreatedBy = _currentUserService.UserId;
-                entry.Entity.Created = _dateTime.UtcNow;
+                entry.Entity.Created = currentTime;
                 entry.Entity.Active = true;
             } 
 
             if (entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
             {
                 //entry.Entity.LastModifiedBy = _currentUserService.UserId;
-                entry.Entity.LastModified = _dateTime.UtcNow;
+                entry.Entity.LastModified = currentTime;
             }
         }
     }

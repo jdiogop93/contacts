@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using Contacts.Application.Common.Models;
-using Contacts.Application.Contacts.Commands;
+﻿using Contacts.Application.Common.Models;
 using Contacts.Application.Contacts.Commands.CreateContact;
 using Contacts.Application.Contacts.Commands.DisableContact;
 using Contacts.Application.Contacts.Commands.UpdateContact;
@@ -10,12 +8,8 @@ using Contacts.Application.Contacts.Queries.GetContact;
 using Contacts.Application.Contacts.Queries.GetContactPhoto;
 using Contacts.Application.Contacts.Queries.GetContactsList;
 using Contacts.Application.Contacts.Queries.GetDetailedContact;
-using Contacts.Infrastructure.Files;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
 
 namespace Contacts.WebUI.Controllers;
 

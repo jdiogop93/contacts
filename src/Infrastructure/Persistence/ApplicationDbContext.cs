@@ -27,17 +27,12 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         _auditableEntitySaveChangesInterceptor = auditableEntitySaveChangesInterceptor;
     }
 
-    public DbSet<TodoList> TodoLists => Set<TodoList>();
-    public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
-
-    #region Contacts
     public DbSet<Contact> Contacts => Set<Contact>();
     public DbSet<ContactNumber> ContactNumbers => Set<ContactNumber>();
     public DbSet<ContactGroup> ContactGroups => Set<ContactGroup>();
     public DbSet<ContactGroupContact> ContactGroupContacts => Set<ContactGroupContact>();
     public DbSet<Message> Messages => Set<Message>();
-    #endregion
 
 
     protected override void OnModelCreating(ModelBuilder builder)
