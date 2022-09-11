@@ -57,11 +57,8 @@ public class ContactsController : ApiControllerBase
     {
         try
         {
-            //command.Photo = await FilesHelper.RetrieveFile(Request);
-
-            //var result = await Mediator.Send(command);
-            //return Ok(result);
-            return Ok(1);
+            var result = await Mediator.Send(command);
+            return Ok(result);
         }
         catch (Exception ex)
         {
