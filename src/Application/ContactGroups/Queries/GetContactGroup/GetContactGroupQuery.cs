@@ -54,10 +54,13 @@ public class GetContactGroupQueryHandler : IRequestHandler<GetContactGroupQuery,
                     FirstName = c.FirstName,
                     LastName = c.LastName,
                     Initials = c.Initials,
-                    Street = c.Address.Street,
-                    ZipCode = c.Address.ZipCode,
-                    City = c.Address.City,
-                    Country = c.Address.Country,
+                    Address = new AddressDto
+                    {
+                        Street = c.Address.Street,
+                        ZipCode = c.Address.ZipCode,
+                        City = c.Address.City,
+                        Country = c.Address.Country
+                    },
                     Email = c.Email
                 };
 

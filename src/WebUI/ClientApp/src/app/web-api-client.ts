@@ -1726,10 +1726,7 @@ export interface IContactGroupContactListItemDto {
 export class ContactDto implements IContactDto {
     firstName?: string;
     lastName?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
+    address?: AddressDto;
     email?: string;
     numbers?: ContactNumberDto[];
 
@@ -1746,10 +1743,7 @@ export class ContactDto implements IContactDto {
         if (_data) {
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
-            this.street = _data["street"];
-            this.zipCode = _data["zipCode"];
-            this.city = _data["city"];
-            this.country = _data["country"];
+            this.address = _data["address"] ? AddressDto.fromJS(_data["address"]) : <any>undefined;
             this.email = _data["email"];
             if (Array.isArray(_data["numbers"])) {
                 this.numbers = [] as any;
@@ -1770,10 +1764,7 @@ export class ContactDto implements IContactDto {
         data = typeof data === 'object' ? data : {};
         data["firstName"] = this.firstName;
         data["lastName"] = this.lastName;
-        data["street"] = this.street;
-        data["zipCode"] = this.zipCode;
-        data["city"] = this.city;
-        data["country"] = this.country;
+        data["address"] = this.address ? this.address.toJSON() : <any>undefined;
         data["email"] = this.email;
         if (Array.isArray(this.numbers)) {
             data["numbers"] = [];
@@ -1787,10 +1778,7 @@ export class ContactDto implements IContactDto {
 export interface IContactDto {
     firstName?: string;
     lastName?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
+    address?: AddressDto;
     email?: string;
     numbers?: ContactNumberDto[];
 }
@@ -1900,6 +1888,54 @@ export enum ContactNumberTypeEnum {
     HOME = 0,
     MOBILE = 1,
     WORK = 2,
+}
+
+export class AddressDto implements IAddressDto {
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+
+    constructor(data?: IAddressDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.street = _data["street"];
+            this.zipCode = _data["zipCode"];
+            this.city = _data["city"];
+            this.country = _data["country"];
+        }
+    }
+
+    static fromJS(data: any): AddressDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddressDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["street"] = this.street;
+        data["zipCode"] = this.zipCode;
+        data["city"] = this.city;
+        data["country"] = this.country;
+        return data;
+    }
+}
+
+export interface IAddressDto {
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
 }
 
 export class ContactNumberDto extends ContactNumberDetailedDto implements IContactNumberDto {
@@ -2162,10 +2198,7 @@ export interface IContactListItemDto {
 export class CreateContactCommand implements ICreateContactCommand {
     firstName?: string;
     lastName?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
+    address?: AddressDto;
     email?: string;
     numbers?: ContactNumberDto[];
 
@@ -2182,10 +2215,7 @@ export class CreateContactCommand implements ICreateContactCommand {
         if (_data) {
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
-            this.street = _data["street"];
-            this.zipCode = _data["zipCode"];
-            this.city = _data["city"];
-            this.country = _data["country"];
+            this.address = _data["address"] ? AddressDto.fromJS(_data["address"]) : <any>undefined;
             this.email = _data["email"];
             if (Array.isArray(_data["numbers"])) {
                 this.numbers = [] as any;
@@ -2206,10 +2236,7 @@ export class CreateContactCommand implements ICreateContactCommand {
         data = typeof data === 'object' ? data : {};
         data["firstName"] = this.firstName;
         data["lastName"] = this.lastName;
-        data["street"] = this.street;
-        data["zipCode"] = this.zipCode;
-        data["city"] = this.city;
-        data["country"] = this.country;
+        data["address"] = this.address ? this.address.toJSON() : <any>undefined;
         data["email"] = this.email;
         if (Array.isArray(this.numbers)) {
             data["numbers"] = [];
@@ -2223,10 +2250,7 @@ export class CreateContactCommand implements ICreateContactCommand {
 export interface ICreateContactCommand {
     firstName?: string;
     lastName?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
+    address?: AddressDto;
     email?: string;
     numbers?: ContactNumberDto[];
 }
@@ -2235,10 +2259,7 @@ export class ContactItemDto implements IContactItemDto {
     id?: number;
     name?: string;
     email?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
+    address?: AddressDto;
     defaultPhoneNumber?: string;
 
     constructor(data?: IContactItemDto) {
@@ -2255,10 +2276,7 @@ export class ContactItemDto implements IContactItemDto {
             this.id = _data["id"];
             this.name = _data["name"];
             this.email = _data["email"];
-            this.street = _data["street"];
-            this.zipCode = _data["zipCode"];
-            this.city = _data["city"];
-            this.country = _data["country"];
+            this.address = _data["address"] ? AddressDto.fromJS(_data["address"]) : <any>undefined;
             this.defaultPhoneNumber = _data["defaultPhoneNumber"];
         }
     }
@@ -2275,10 +2293,7 @@ export class ContactItemDto implements IContactItemDto {
         data["id"] = this.id;
         data["name"] = this.name;
         data["email"] = this.email;
-        data["street"] = this.street;
-        data["zipCode"] = this.zipCode;
-        data["city"] = this.city;
-        data["country"] = this.country;
+        data["address"] = this.address ? this.address.toJSON() : <any>undefined;
         data["defaultPhoneNumber"] = this.defaultPhoneNumber;
         return data;
     }
@@ -2288,10 +2303,7 @@ export interface IContactItemDto {
     id?: number;
     name?: string;
     email?: string;
-    street?: string;
-    zipCode?: string;
-    city?: string;
-    country?: string;
+    address?: AddressDto;
     defaultPhoneNumber?: string;
 }
 

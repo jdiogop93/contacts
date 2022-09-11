@@ -20,9 +20,9 @@ public class ContactConfiguration : IEntityTypeConfiguration<Contact>
                 .HasMaxLength(200)
                 .HasColumnName(nameof(Media.FileName));
 
-            cb.Property(p => p.FileExtension)
+            cb.Property(p => p.MimeType)
                 .HasMaxLength(200)
-                .HasColumnName(nameof(Media.FileExtension));
+                .HasColumnName(nameof(Media.MimeType));
 
             cb.Property(p => p.Size)
                 .HasColumnName(nameof(Media.Size));

@@ -41,10 +41,13 @@ public class GetDetailedContactQueryHandler : IRequestHandler<GetDetailedContact
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             Initials = entity.Initials,
-            Street = entity.Address.Street,
-            ZipCode = entity.Address.ZipCode,
-            City = entity.Address.City,
-            Country = entity.Address.Country,
+            Address = new AddressDto
+            {
+                Street = entity.Address.Street,
+                ZipCode = entity.Address.ZipCode,
+                City = entity.Address.City,
+                Country = entity.Address.Country
+            },
             Email = entity.Email
         };
 

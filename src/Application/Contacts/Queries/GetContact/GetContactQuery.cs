@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contacts.Application.Common.Exceptions;
 using Contacts.Application.Common.Interfaces;
+using Contacts.Application.Contacts.Commands.Common;
 using Contacts.Application.Contacts.Common;
 using Contacts.Domain.Entities;
 using MediatR;
@@ -39,10 +40,13 @@ public class GetContactQueryHandler : IRequestHandler<GetContactQuery, ContactIt
             Id = entity.Id,
             Name = $"{entity.FirstName} {entity.LastName}",
             Email = entity.Email,
-            Street = entity.Address.Street,
-            ZipCode = entity.Address.ZipCode,
-            City = entity.Address.City,
-            Country = entity.Address.Country,
+            Address = new AddressDto
+            {
+                Street = entity.Address.Street,
+                ZipCode = entity.Address.ZipCode,
+                City = entity.Address.City,
+                Country = entity.Address.Country
+            },
             DefaultPhoneNumber = entity.Numbers.Count > 0 ? $"{entity.Numbers.First().CountryCode} {entity.Numbers.First().PhoneNumber}" : "-"
         };
     }

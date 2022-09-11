@@ -3,24 +3,16 @@ using Contacts.Application.Contacts.Commands.Common;
 using Contacts.Application.Contacts.Common;
 using Contacts.Domain.Entities;
 using Contacts.Domain.Enums;
+using Contacts.Domain.ValueObjects;
 using MediatR;
 
 namespace Contacts.Application.Contacts.Commands.CreateContact;
 
 public record CreateContactCommand : IRequest<int>
 {
-    //photo //TODOzd
-
     public string FirstName { get; set; }
     public string LastName { get; set; }
-
-    #region Address
-    public string Street { get; set; }
-    public string ZipCode { get; set; }
-    public string City { get; set; }
-    public string Country { get; set; }
-    #endregion
-
+    public AddressDto Address { get; set; }
     public string Email { get; set; }
     public HashSet<ContactNumberDto> Numbers { get; set; }
 }
@@ -43,7 +35,7 @@ public class CreateContactCommandHandler : IRequestHandler<CreateContactCommand,
         {
             FirstName = request.FirstName,
             LastName = request.LastName,
-            Address = new Domain.ValueObjects.Address(request.Street, request.ZipCode, request.City, request.Country),
+            Address = new Address(request.Address.Street, request.Address.ZipCode, request.Address.City, request.Address.Country),
             Email = request.Email,
             Numbers = request.Numbers
                 .Select(n => new ContactNumber

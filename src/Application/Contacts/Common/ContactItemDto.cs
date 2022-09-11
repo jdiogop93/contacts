@@ -1,18 +1,12 @@
-﻿namespace Contacts.Application.Contacts.Common;
+﻿using Contacts.Application.Contacts.Commands.Common;
+
+namespace Contacts.Application.Contacts.Common;
 
 public class ContactItemDto
 {
-    //Photo //TODO
     public int Id { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
-
-    #region Address
-    public string Street { get; set; }
-    public string ZipCode { get; set; }
-    public string City { get; set; }
-    public string Country { get; set; }
-    #endregion
-
+    public AddressDto Address { get; set; }
     public string DefaultPhoneNumber { get; set; }
 }

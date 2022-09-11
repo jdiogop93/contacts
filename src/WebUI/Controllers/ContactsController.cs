@@ -7,8 +7,10 @@ using Contacts.Application.Contacts.Common;
 using Contacts.Application.Contacts.Queries.GetContact;
 using Contacts.Application.Contacts.Queries.GetContactsList;
 using Contacts.Application.Contacts.Queries.GetDetailedContact;
+using Contacts.Infrastructure.Files;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Contacts.WebUI.Controllers;
 
@@ -56,8 +58,11 @@ public class ContactsController : ApiControllerBase
     {
         try
         {
-            var result = await Mediator.Send(command);
-            return Ok(result);
+            //command.Photo = await FilesHelper.RetrieveFile(Request);
+
+            //var result = await Mediator.Send(command);
+            //return Ok(result);
+            return Ok(1);
         }
         catch (Exception ex)
         {

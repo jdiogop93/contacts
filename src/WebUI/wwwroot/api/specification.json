@@ -1160,6 +1160,24 @@
           "lastName": {
             "type": "string"
           },
+          "address": {
+            "$ref": "#/components/schemas/AddressDto"
+          },
+          "email": {
+            "type": "string"
+          },
+          "numbers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactNumberDto"
+            }
+          }
+        }
+      },
+      "AddressDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
           "street": {
             "type": "string"
           },
@@ -1171,15 +1189,6 @@
           },
           "country": {
             "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "numbers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ContactNumberDto"
-            }
           }
         }
       },
@@ -1303,17 +1312,8 @@
           "lastName": {
             "type": "string"
           },
-          "street": {
-            "type": "string"
-          },
-          "zipCode": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
+          "address": {
+            "$ref": "#/components/schemas/AddressDto"
           },
           "email": {
             "type": "string"
@@ -1340,17 +1340,8 @@
           "email": {
             "type": "string"
           },
-          "street": {
-            "type": "string"
-          },
-          "zipCode": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
+          "address": {
+            "$ref": "#/components/schemas/AddressDto"
           },
           "defaultPhoneNumber": {
             "type": "string"
