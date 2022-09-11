@@ -89,7 +89,7 @@ public class ApplicationDbContextInitialiser
                     LastName = "Pereira",
                     Initials = "AP",
                     Address = new Domain.ValueObjects.Address("Nogueira", "4900", "Viana do Castelo", "Portugal"),
-                    Email = "jde93pereira@gmail.com", //"americo.pereira@emailteste.pt",
+                    Email = "americo.pereira@emailteste.pt",
                     Numbers = new List<ContactNumber>
                     {
                         new ContactNumber
@@ -101,7 +101,7 @@ public class ApplicationDbContextInitialiser
                         new ContactNumber
                         {
                             CountryCode = "+351",
-                            PhoneNumber = "961052627",
+                            PhoneNumber = "222222222",
                             Type = Domain.Enums.ContactNumberType.MOBILE,
                             Default = true
                         }
@@ -114,7 +114,7 @@ public class ApplicationDbContextInitialiser
                     LastName = "Fernandes",
                     Initials = "BF",
                     Address = new Domain.ValueObjects.Address("Massarelos", "4901", "Porto", "Portugal"),
-                    Email = "ze.diogo.pereira@hotmail.com", //"barbara.fernandes@emailteste.pt",
+                    Email = "barbara.fernandes@emailteste.pt",
                     Numbers = new List<ContactNumber>
                     {
                         new ContactNumber
@@ -126,7 +126,7 @@ public class ApplicationDbContextInitialiser
                         new ContactNumber
                         {
                             CountryCode = "+351",
-                            PhoneNumber = "961052627",
+                            PhoneNumber = "444444444",
                             Type = Domain.Enums.ContactNumberType.MOBILE,
                             Default = true
                         }
@@ -139,7 +139,7 @@ public class ApplicationDbContextInitialiser
                     LastName = "Carvalho",
                     Initials = "TC",
                     Address = new Domain.ValueObjects.Address("Figueira da Foz", "5678", "Coimbra", "Portugal"),
-                    Email = "diogo-85@sapo.pt", //"tiago.carvalho@emailteste.pt",
+                    Email = "tiago.carvalho@emailteste.pt",
                     Numbers = new List<ContactNumber>
                     {
                         new ContactNumber
@@ -151,7 +151,7 @@ public class ApplicationDbContextInitialiser
                         new ContactNumber
                         {
                             CountryCode = "+351",
-                            PhoneNumber = "961052627",
+                            PhoneNumber = "666666666",
                             Type = Domain.Enums.ContactNumberType.WORK,
                             Default = true
                         }
